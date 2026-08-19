@@ -1,0 +1,398 @@
+[gd_scene load_steps=29 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Environment/TestFloor.tscn" id="2_floor"]
+[ext_resource type="PackedScene" path="res://Scenes/Camera/TacticalCameraRig.tscn" id="3_camera"]
+[ext_resource type="Script" path="res://Scripts/Systems/GameModeManager.cs" id="4_mode"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/WallAstra_Straight.gltf" id="5_wall"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_3Plates.gltf" id="6_floor_asset"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_Ramp_4.gltf" id="7_ramp"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Door_Frame_A.gltf" id="8_door"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Column_Pipes.gltf" id="9_column"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_AccessPoint.gltf" id="10_access"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Computer.gltf" id="11_computer"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_PipeHolder.gltf" id="12_pipe"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Light_Floor.gltf" id="13_light"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Fan_Small.gltf" id="14_fan"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Crate4.gltf" id="15_crate"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Chest.gltf" id="16_chest"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Rail_3.gltf" id="17_rail"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Barrel_Large.gltf" id="18_barrel"]
+
+[sub_resource type="Environment" id="Environment_gallery"]
+background_mode = 1
+background_color = Color(0.025, 0.035, 0.055, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.52, 0.6, 0.72, 1)
+ambient_light_energy = 0.72
+reflected_light_source = 2
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_gallery"]
+vertices = PackedVector3Array(-16, 0, -7, -3, 0, -7, 3, 0, -7, 16, 0, -7, -16, 0, -2, -3, 0, -2, 3, 0, -2, 16, 0, -2, -16, 0, 2, -3, 0, 2, 3, 0, 2, 16, 0, 2, -16, 0, 7, -3, 0, 7, 3, 0, 7, 16, 0, 7)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 5, 4), PackedInt32Array(1, 2, 6, 5), PackedInt32Array(2, 3, 7, 6), PackedInt32Array(4, 5, 9, 8), PackedInt32Array(6, 7, 11, 10), PackedInt32Array(8, 9, 13, 12), PackedInt32Array(9, 10, 14, 13), PackedInt32Array(10, 11, 15, 14)])
+agent_radius = 0.45
+agent_height = 1.8
+
+[sub_resource type="BoxShape3D" id="Shape_wall"]
+size = Vector3(1.3, 3.1, 4.1)
+
+[sub_resource type="BoxShape3D" id="Shape_ramp"]
+size = Vector3(2.1, 2.0, 4.1)
+
+[sub_resource type="BoxShape3D" id="Shape_door_post"]
+size = Vector3(0.9, 5.15, 1.0)
+
+[sub_resource type="BoxShape3D" id="Shape_column"]
+size = Vector3(0.95, 5.0, 0.95)
+
+[sub_resource type="BoxShape3D" id="Shape_computer"]
+size = Vector3(0.8, 1.6, 0.65)
+
+[sub_resource type="BoxShape3D" id="Shape_pipe_holder"]
+size = Vector3(4.2, 1.0, 1.25)
+
+[sub_resource type="BoxShape3D" id="Shape_crate"]
+size = Vector3(1.15, 1.15, 1.15)
+
+[sub_resource type="BoxShape3D" id="Shape_chest"]
+size = Vector3(1.55, 0.78, 0.8)
+
+[sub_resource type="BoxShape3D" id="Shape_rail"]
+size = Vector3(0.12, 0.9, 3.05)
+
+[sub_resource type="CylinderShape3D" id="Shape_barrel"]
+radius = 0.28
+height = 1.12
+
+[node name="AssetGallery" type="Node3D"]
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="NeutralTestFloor" parent="Environment" instance=ExtResource("2_floor")]
+position = Vector3(0, -0.25, 0)
+scale = Vector3(1.7, 1, 1.35)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="Environment"]
+navigation_mesh = SubResource("NavigationMesh_gallery")
+
+[node name="Lighting" type="Node3D" parent="Environment"]
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Environment/Lighting"]
+rotation_degrees = Vector3(-58, -32, 0)
+light_color = Color(0.88, 0.93, 1, 1)
+light_energy = 1.35
+shadow_enabled = true
+
+[node name="FillLight" type="DirectionalLight3D" parent="Environment/Lighting"]
+rotation_degrees = Vector3(-42, 145, 0)
+light_color = Color(0.55, 0.68, 1, 1)
+light_energy = 0.42
+shadow_enabled = false
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment/Lighting"]
+environment = SubResource("Environment_gallery")
+
+[node name="GalleryAssets" type="Node3D" parent="."]
+
+[node name="Architecture" type="Node3D" parent="GalleryAssets"]
+
+[node name="WallAstra_Straight" type="Node3D" parent="GalleryAssets/Architecture"]
+position = Vector3(-13, 0, -10)
+
+[node name="Model" parent="GalleryAssets/Architecture/WallAstra_Straight" instance=ExtResource("5_wall")]
+position = Vector3(2.169, 0.007, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Architecture/WallAstra_Straight"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Architecture/WallAstra_Straight/Collision"]
+position = Vector3(0, 1.55, 0)
+shape = SubResource("Shape_wall")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Architecture/WallAstra_Straight"]
+visible = false
+position = Vector3(0, 3.7, 0)
+text = "WallAstra_Straight"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Platform_3Plates" type="Node3D" parent="GalleryAssets/Architecture"]
+position = Vector3(-6, 0.02, -10)
+
+[node name="Model" parent="GalleryAssets/Architecture/Platform_3Plates" instance=ExtResource("6_floor_asset")]
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Architecture/Platform_3Plates"]
+visible = false
+position = Vector3(0, 1.0, 0)
+text = "Platform_3Plates"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Platform_Ramp_4" type="Node3D" parent="GalleryAssets/Architecture"]
+position = Vector3(0, 0, -12)
+
+[node name="Model" parent="GalleryAssets/Architecture/Platform_Ramp_4" instance=ExtResource("7_ramp")]
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Architecture/Platform_Ramp_4"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Architecture/Platform_Ramp_4/Collision"]
+position = Vector3(0, 1, 2)
+shape = SubResource("Shape_ramp")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Architecture/Platform_Ramp_4"]
+visible = false
+position = Vector3(0, 2.8, 2)
+text = "Platform_Ramp_4"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Door_Frame_A" type="Node3D" parent="GalleryAssets/Architecture"]
+position = Vector3(7, 0, -10)
+
+[node name="Model" parent="GalleryAssets/Architecture/Door_Frame_A" instance=ExtResource("8_door")]
+position = Vector3(0, 0.119, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Architecture/Door_Frame_A"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="LeftPost" type="CollisionShape3D" parent="GalleryAssets/Architecture/Door_Frame_A/Collision"]
+position = Vector3(-2.0, 2.58, 0)
+shape = SubResource("Shape_door_post")
+
+[node name="RightPost" type="CollisionShape3D" parent="GalleryAssets/Architecture/Door_Frame_A/Collision"]
+position = Vector3(2.0, 2.58, 0)
+shape = SubResource("Shape_door_post")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Architecture/Door_Frame_A"]
+visible = false
+position = Vector3(0, 5.8, 0)
+text = "Door_Frame_A"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Column_Pipes" type="Node3D" parent="GalleryAssets/Architecture"]
+position = Vector3(13, 0, -10)
+
+[node name="Model" parent="GalleryAssets/Architecture/Column_Pipes" instance=ExtResource("9_column")]
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Architecture/Column_Pipes"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Architecture/Column_Pipes/Collision"]
+position = Vector3(0, 2.5, 0)
+shape = SubResource("Shape_column")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Architecture/Column_Pipes"]
+visible = false
+position = Vector3(0, 5.7, 0)
+text = "Column_Pipes"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Infrastructure" type="Node3D" parent="GalleryAssets"]
+
+[node name="Prop_AccessPoint" type="Node3D" parent="GalleryAssets/Infrastructure"]
+position = Vector3(-11, 0, 0)
+
+[node name="Model" parent="GalleryAssets/Infrastructure/Prop_AccessPoint" instance=ExtResource("10_access")]
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Infrastructure/Prop_AccessPoint"]
+visible = false
+position = Vector3(0, 2.2, 0)
+text = "Prop_AccessPoint"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Computer" type="Node3D" parent="GalleryAssets/Infrastructure"]
+position = Vector3(-15, 0, 0)
+
+[node name="Model" parent="GalleryAssets/Infrastructure/Prop_Computer" instance=ExtResource("11_computer")]
+position = Vector3(0, 0.002, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Infrastructure/Prop_Computer"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Infrastructure/Prop_Computer/Collision"]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("Shape_computer")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Infrastructure/Prop_Computer"]
+visible = false
+position = Vector3(0, 2.2, 0)
+text = "Prop_Computer"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_PipeHolder" type="Node3D" parent="GalleryAssets/Infrastructure"]
+position = Vector3(0, 0, 0)
+
+[node name="Model" parent="GalleryAssets/Infrastructure/Prop_PipeHolder" instance=ExtResource("12_pipe")]
+position = Vector3(0, -0.008, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Infrastructure/Prop_PipeHolder"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Infrastructure/Prop_PipeHolder/Collision"]
+position = Vector3(0, 0.5, 0)
+shape = SubResource("Shape_pipe_holder")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Infrastructure/Prop_PipeHolder"]
+visible = false
+position = Vector3(0, 1.8, 0)
+text = "Prop_PipeHolder"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Light_Floor" type="Node3D" parent="GalleryAssets/Infrastructure"]
+position = Vector3(8, 0, 0)
+
+[node name="Model" parent="GalleryAssets/Infrastructure/Prop_Light_Floor" instance=ExtResource("13_light")]
+position = Vector3(0, 0.002, 0)
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Infrastructure/Prop_Light_Floor"]
+visible = false
+position = Vector3(0, 1.0, 0)
+text = "Prop_Light_Floor"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Fan_Small" type="Node3D" parent="GalleryAssets/Infrastructure"]
+position = Vector3(13, 0, 0)
+
+[node name="Model" parent="GalleryAssets/Infrastructure/Prop_Fan_Small" instance=ExtResource("14_fan")]
+position = Vector3(0, 0.055, 0)
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Infrastructure/Prop_Fan_Small"]
+visible = false
+position = Vector3(0, 1.2, 0)
+text = "Prop_Fan_Small"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Props" type="Node3D" parent="GalleryAssets"]
+
+[node name="Prop_Crate4" type="Node3D" parent="GalleryAssets/Props"]
+position = Vector3(-10, 0, 10)
+
+[node name="Model" parent="GalleryAssets/Props/Prop_Crate4" instance=ExtResource("15_crate")]
+position = Vector3(0, 0.561, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Props/Prop_Crate4"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Props/Prop_Crate4/Collision"]
+position = Vector3(0, 0.575, 0)
+shape = SubResource("Shape_crate")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Props/Prop_Crate4"]
+visible = false
+position = Vector3(0, 1.9, 0)
+text = "Prop_Crate4"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Chest" type="Node3D" parent="GalleryAssets/Props"]
+position = Vector3(-3, 0, 10)
+
+[node name="Model" parent="GalleryAssets/Props/Prop_Chest" instance=ExtResource("16_chest")]
+position = Vector3(0, -0.003, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Props/Prop_Chest"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Props/Prop_Chest/Collision"]
+position = Vector3(0, 0.39, 0)
+shape = SubResource("Shape_chest")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Props/Prop_Chest"]
+visible = false
+position = Vector3(0, 1.5, 0)
+text = "Prop_Chest"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Rail_3" type="Node3D" parent="GalleryAssets/Props"]
+position = Vector3(4, 0, 10)
+
+[node name="Model" parent="GalleryAssets/Props/Prop_Rail_3" instance=ExtResource("17_rail")]
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Props/Prop_Rail_3"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Props/Prop_Rail_3/Collision"]
+position = Vector3(0, 0.45, -1.49)
+shape = SubResource("Shape_rail")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Props/Prop_Rail_3"]
+visible = false
+position = Vector3(0, 1.6, -1.49)
+text = "Prop_Rail_3"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="Prop_Barrel_Large" type="Node3D" parent="GalleryAssets/Props"]
+position = Vector3(10, 0, 10)
+
+[node name="Model" parent="GalleryAssets/Props/Prop_Barrel_Large" instance=ExtResource("18_barrel")]
+position = Vector3(0, -0.008, 0)
+
+[node name="Collision" type="StaticBody3D" parent="GalleryAssets/Props/Prop_Barrel_Large"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="GalleryAssets/Props/Prop_Barrel_Large/Collision"]
+position = Vector3(0, 0.56, 0)
+shape = SubResource("Shape_barrel")
+
+[node name="Label" type="Label3D" parent="GalleryAssets/Props/Prop_Barrel_Large"]
+visible = false
+position = Vector3(0, 1.8, 0)
+text = "Prop_Barrel_Large"
+font_size = 28
+outline_size = 6
+billboard = 1
+fixed_size = true
+
+[node name="GameModeManager" type="Node" parent="." groups=["game_mode_manager"]]
+script = ExtResource("4_mode")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector3(0, 1.2, 5)
+
+[node name="CameraRig" parent="." instance=ExtResource("3_camera")]

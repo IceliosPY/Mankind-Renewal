@@ -1,0 +1,641 @@
+[gd_scene load_steps=43 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Camera/TacticalCameraRig.tscn" id="2_camera"]
+[ext_resource type="Script" path="res://Scripts/Systems/GameModeManager.cs" id="3_mode"]
+[ext_resource type="NavigationMesh" path="res://Scenes/Tests/Navigation/VisualSlice01Navigation.tres" id="4_navigation"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_3Plates.gltf" id="5_floor_plates"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_CenterPlate.gltf" id="6_floor_center"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_DarkPlates.gltf" id="7_floor_dark"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Platform_Ramp_4.gltf" id="10_ramp"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/WallAstra_Straight.gltf" id="11_wall"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/WallAstra_Straight_Divided.gltf" id="12_wall_divided"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/WallAstra_Straight_Window.gltf" id="13_wall_window"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/TopCables_Straight_Hanging.gltf" id="14_cables_wall"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Door_Frame_A.gltf" id="15_door_frame"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Door_DarkMetal.gltf" id="16_door"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Column_MetalSupport.gltf" id="17_support"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Column_Pipes.gltf" id="18_column_pipes"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_PipeHolder.gltf" id="19_pipe_holder"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Computer.gltf" id="20_computer"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_AccessPoint.gltf" id="21_access"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Light_Floor.gltf" id="22_light_floor"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Light_Wide.gltf" id="23_light_wide"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Fan_Small.gltf" id="24_fan"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Vent_Big.gltf" id="25_vent"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Cable_3.gltf" id="26_cable"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Crate3.gltf" id="27_crate3"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Crate4.gltf" id="28_crate4"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Chest.gltf" id="29_chest"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Rail_3.gltf" id="30_rail"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Barrel_Large.gltf" id="31_barrel"]
+
+[sub_resource type="Environment" id="Environment_slice"]
+background_mode = 1
+background_color = Color(0.008, 0.014, 0.027, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.28, 0.38, 0.56, 1)
+ambient_light_energy = 0.52
+reflected_light_source = 2
+tonemap_mode = 2
+glow_enabled = true
+glow_intensity = 0.72
+glow_bloom = 0.08
+ssao_enabled = true
+ssao_radius = 1.6
+ssao_intensity = 2.2
+
+[sub_resource type="BoxShape3D" id="Shape_main_floor"]
+size = Vector3(24, 0.4, 24)
+
+[sub_resource type="BoxShape3D" id="Shape_upper_floor"]
+size = Vector3(8, 0.3, 8)
+
+[sub_resource type="BoxShape3D" id="Shape_ramp"]
+size = Vector3(2.02, 0.28, 4.48)
+
+[sub_resource type="BoxShape3D" id="Shape_wall"]
+size = Vector3(1.25, 3.05, 4.05)
+
+[sub_resource type="BoxShape3D" id="Shape_window_wall"]
+size = Vector3(0.52, 3.05, 4.05)
+
+[sub_resource type="BoxShape3D" id="Shape_gate"]
+size = Vector3(4.35, 4.15, 0.42)
+
+[sub_resource type="BoxShape3D" id="Shape_pipe_holder"]
+size = Vector3(4.2, 1.0, 1.25)
+
+[sub_resource type="BoxShape3D" id="Shape_computer"]
+size = Vector3(0.8, 1.62, 0.65)
+
+[sub_resource type="BoxShape3D" id="Shape_crate3"]
+size = Vector3(1.04, 1.04, 1.04)
+
+[sub_resource type="BoxShape3D" id="Shape_crate4"]
+size = Vector3(1.16, 1.16, 1.16)
+
+[sub_resource type="BoxShape3D" id="Shape_chest"]
+size = Vector3(1.55, 0.78, 0.8)
+
+[sub_resource type="BoxShape3D" id="Shape_rail"]
+size = Vector3(0.12, 0.9, 3.05)
+
+[sub_resource type="CylinderShape3D" id="Shape_barrel"]
+radius = 0.28
+height = 1.12
+
+[node name="VisualSlice01" type="Node3D"]
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
+environment = SubResource("Environment_slice")
+
+[node name="Lighting" type="Node3D" parent="World"]
+
+[node name="DirectionalKey" type="DirectionalLight3D" parent="World/Lighting"]
+rotation_degrees = Vector3(-58, -32, 0)
+light_color = Color(0.64, 0.75, 1, 1)
+light_energy = 1.08
+shadow_enabled = true
+
+[node name="DirectionalFill" type="DirectionalLight3D" parent="World/Lighting"]
+rotation_degrees = Vector3(-48, 142, 0)
+light_color = Color(0.42, 0.5, 0.68, 1)
+light_energy = 0.12
+
+[node name="GateRedLight" type="OmniLight3D" parent="World/Lighting"]
+position = Vector3(0, 4.2, -10.9)
+light_color = Color(1, 0.16, 0.08, 1)
+light_energy = 4.2
+shadow_enabled = true
+omni_range = 7.5
+
+[node name="UpperDeckBlueLight" type="OmniLight3D" parent="World/Lighting"]
+position = Vector3(8, 4.4, -10.7)
+light_color = Color(0.1, 0.62, 1, 1)
+light_energy = 3.6
+shadow_enabled = true
+omni_range = 7.0
+
+[node name="RampLeftLight" type="OmniLight3D" parent="World/Lighting"]
+position = Vector3(7, 0.35, 0.3)
+light_color = Color(0.1, 0.72, 1, 1)
+light_energy = 2.1
+omni_range = 4.2
+
+[node name="RampRightLight" type="OmniLight3D" parent="World/Lighting"]
+position = Vector3(9, 0.35, 0.3)
+light_color = Color(0.1, 0.72, 1, 1)
+light_energy = 2.1
+omni_range = 4.2
+
+[node name="ServiceBayAmberLight" type="OmniLight3D" parent="World/Lighting"]
+position = Vector3(-10.4, 2.3, 4.0)
+light_color = Color(1, 0.56, 0.2, 1)
+light_energy = 2.7
+shadow_enabled = true
+omni_range = 6.0
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="World"]
+navigation_mesh = ExtResource("4_navigation")
+
+[node name="CollisionGeometry" type="Node3D" parent="World"]
+
+[node name="MainFloor" type="StaticBody3D" parent="World/CollisionGeometry"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/CollisionGeometry/MainFloor"]
+position = Vector3(0, -0.2, 0)
+shape = SubResource("Shape_main_floor")
+
+[node name="UpperFloor" type="StaticBody3D" parent="World/CollisionGeometry"]
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/CollisionGeometry/UpperFloor"]
+position = Vector3(8, 1.85, -8)
+shape = SubResource("Shape_upper_floor")
+
+[node name="Architecture" type="Node3D" parent="World"]
+
+[node name="MainFloorModules" type="Node3D" parent="World/Architecture"]
+
+[node name="Tile_Xm10_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-10, 0.01, -10)
+[node name="Tile_Xm6_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-6, 0.01, -10)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_Xm2_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(-2, 0.01, -10)
+[node name="Tile_X2_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(2, 0.01, -10)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Tile_X6_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(6, 0.01, -10)
+[node name="Tile_X10_Zm10" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(10, 0.01, -10)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="Tile_Xm10_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-10, 0.01, -6)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_Xm6_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-6, 0.01, -6)
+[node name="Tile_Xm2_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-2, 0.01, -6)
+[node name="Tile_X2_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(2, 0.01, -6)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_X6_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(6, 0.01, -6)
+[node name="Tile_X10_Zm6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(10, 0.01, -6)
+
+[node name="Tile_Xm10_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-10, 0.01, -2)
+[node name="Tile_Xm6_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-6, 0.01, -2)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Tile_Xm2_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(-2, 0.01, -2)
+[node name="Tile_X2_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(2, 0.01, -2)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_X6_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(6, 0.01, -2)
+[node name="Tile_X10_Zm2" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(10, 0.01, -2)
+
+[node name="Tile_Xm10_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-10, 0.01, 2)
+[node name="Tile_Xm6_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-6, 0.01, 2)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_Xm2_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-2, 0.01, 2)
+[node name="Tile_X2_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(2, 0.01, 2)
+[node name="Tile_X6_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(6, 0.01, 2)
+[node name="Tile_X10_Z2" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(10, 0.01, 2)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="Tile_Xm10_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-10, 0.01, 6)
+[node name="Tile_Xm6_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-6, 0.01, 6)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_Xm2_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-2, 0.01, 6)
+[node name="Tile_X2_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(2, 0.01, 6)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Tile_X6_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(6, 0.01, 6)
+[node name="Tile_X10_Z6" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(10, 0.01, 6)
+
+[node name="Tile_Xm10_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(-10, 0.01, 10)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Tile_Xm6_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(-6, 0.01, 10)
+[node name="Tile_Xm2_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(-2, 0.01, 10)
+[node name="Tile_X2_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("5_floor_plates")]
+position = Vector3(2, 0.01, 10)
+[node name="Tile_X6_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("7_floor_dark")]
+position = Vector3(6, 0.01, 10)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Tile_X10_Z10" parent="World/Architecture/MainFloorModules" instance=ExtResource("6_floor_center")]
+position = Vector3(10, 0.01, 10)
+
+[node name="UpperDeck" type="Node3D" parent="World/Architecture"]
+
+[node name="UpperTile_NorthWest" parent="World/Architecture/UpperDeck" instance=ExtResource("7_floor_dark")]
+position = Vector3(6, 2.01, -10)
+[node name="UpperTile_NorthEast" parent="World/Architecture/UpperDeck" instance=ExtResource("7_floor_dark")]
+position = Vector3(10, 2.01, -10)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="UpperTile_SouthWest" parent="World/Architecture/UpperDeck" instance=ExtResource("5_floor_plates")]
+position = Vector3(6, 2.01, -6)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="UpperTile_SouthEast" parent="World/Architecture/UpperDeck" instance=ExtResource("6_floor_center")]
+position = Vector3(10, 2.01, -6)
+
+[node name="RampLeft" type="Node3D" parent="World/Architecture"]
+position = Vector3(7, 0, 0)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Model" parent="World/Architecture/RampLeft" instance=ExtResource("10_ramp")]
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/RampLeft"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/RampLeft/Collision"]
+position = Vector3(0, 1, 2)
+rotation_degrees = Vector3(-26.565, 0, 0)
+shape = SubResource("Shape_ramp")
+
+[node name="RampRight" type="Node3D" parent="World/Architecture"]
+position = Vector3(9, 0, 0)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Model" parent="World/Architecture/RampRight" instance=ExtResource("10_ramp")]
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/RampRight"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/RampRight/Collision"]
+position = Vector3(0, 1, 2)
+rotation_degrees = Vector3(-26.565, 0, 0)
+shape = SubResource("Shape_ramp")
+
+[node name="DeckSupports" type="Node3D" parent="World/Architecture"]
+[node name="SupportSouthWest" parent="World/Architecture/DeckSupports" instance=ExtResource("17_support")]
+position = Vector3(4.5, 1, -4.5)
+rotation_degrees = Vector3(90, 0, 0)
+scale = Vector3(1, 1, 0.5)
+[node name="SupportSouthEast" parent="World/Architecture/DeckSupports" instance=ExtResource("17_support")]
+position = Vector3(11.5, 1, -4.5)
+rotation_degrees = Vector3(90, 0, 0)
+scale = Vector3(1, 1, 0.5)
+[node name="SupportNorthWest" parent="World/Architecture/DeckSupports" instance=ExtResource("17_support")]
+position = Vector3(4.5, 1, -11.5)
+rotation_degrees = Vector3(90, 0, 0)
+scale = Vector3(1, 1, 0.5)
+[node name="SupportNorthEast" parent="World/Architecture/DeckSupports" instance=ExtResource("17_support")]
+position = Vector3(11.5, 1, -11.5)
+rotation_degrees = Vector3(90, 0, 0)
+scale = Vector3(1, 1, 0.5)
+
+[node name="IndustrialGate" type="Node3D" parent="World/Architecture"]
+position = Vector3(0, 0, -11.7)
+[node name="Frame" parent="World/Architecture/IndustrialGate" instance=ExtResource("15_door_frame")]
+position = Vector3(0, 0.119, 0)
+[node name="LeftDoor" parent="World/Architecture/IndustrialGate" instance=ExtResource("16_door")]
+[node name="RightDoor" parent="World/Architecture/IndustrialGate" instance=ExtResource("16_door")]
+scale = Vector3(-1, 1, 1)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/IndustrialGate"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/IndustrialGate/Collision"]
+position = Vector3(0, 2.08, 0)
+shape = SubResource("Shape_gate")
+
+[node name="BoundaryWalls" type="Node3D" parent="World/Architecture"]
+
+[node name="NorthWallWestA" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-10, 0, -11.7)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Architecture/BoundaryWalls/NorthWallWestA" instance=ExtResource("11_wall")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/NorthWallWestA"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/NorthWallWestA/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="NorthWallWestB" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-6, 0, -11.7)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Architecture/BoundaryWalls/NorthWallWestB" instance=ExtResource("12_wall_divided")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/NorthWallWestB"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/NorthWallWestB/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="WestWallNorth" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-11.7, 0, -10)
+[node name="Model" parent="World/Architecture/BoundaryWalls/WestWallNorth" instance=ExtResource("12_wall_divided")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/WestWallNorth"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/WestWallNorth/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="WestWallMiddleA" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-11.7, 0, -6)
+[node name="Model" parent="World/Architecture/BoundaryWalls/WestWallMiddleA" instance=ExtResource("11_wall")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/WestWallMiddleA"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/WestWallMiddleA/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="WestWallMiddleB" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-11.7, 0, -2)
+[node name="Model" parent="World/Architecture/BoundaryWalls/WestWallMiddleB" instance=ExtResource("12_wall_divided")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/WestWallMiddleB"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/WestWallMiddleB/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="WestWallSouthA" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-11.7, 0, 2)
+[node name="Model" parent="World/Architecture/BoundaryWalls/WestWallSouthA" instance=ExtResource("11_wall")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/WestWallSouthA"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/WestWallSouthA/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="WestWallSouthB" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(-11.7, 0, 6)
+[node name="Model" parent="World/Architecture/BoundaryWalls/WestWallSouthB" instance=ExtResource("12_wall_divided")]
+position = Vector3(2.169, 0.007, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/WestWallSouthB"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/WestWallSouthB/Collision"]
+position = Vector3(0, 1.52, 0)
+shape = SubResource("Shape_wall")
+
+[node name="UpperNorthWallA" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(6, 2, -11.7)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Architecture/BoundaryWalls/UpperNorthWallA" instance=ExtResource("13_wall_window")]
+position = Vector3(2.248, 0, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/UpperNorthWallA"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/UpperNorthWallA/Collision"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("Shape_window_wall")
+
+[node name="UpperNorthWallB" type="Node3D" parent="World/Architecture/BoundaryWalls"]
+position = Vector3(10, 2, -11.7)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Architecture/BoundaryWalls/UpperNorthWallB" instance=ExtResource("13_wall_window")]
+position = Vector3(2.248, 0, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Architecture/BoundaryWalls/UpperNorthWallB"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Architecture/BoundaryWalls/UpperNorthWallB/Collision"]
+position = Vector3(0, 1.5, 0)
+shape = SubResource("Shape_window_wall")
+
+[node name="HangingCableWall" parent="World/Architecture/BoundaryWalls" instance=ExtResource("14_cables_wall")]
+position = Vector3(-9.35, 0, -6)
+
+[node name="Infrastructure" type="Node3D" parent="World"]
+
+[node name="CentralPipeManifold" type="Node3D" parent="World/Infrastructure"]
+position = Vector3(-2, 0, 2)
+[node name="Model" parent="World/Infrastructure/CentralPipeManifold" instance=ExtResource("19_pipe_holder")]
+position = Vector3(0, -0.008, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Infrastructure/CentralPipeManifold"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Infrastructure/CentralPipeManifold/Collision"]
+position = Vector3(0, 0.5, 0)
+shape = SubResource("Shape_pipe_holder")
+
+[node name="UpperControlComputer" type="Node3D" parent="World/Infrastructure"]
+position = Vector3(9, 2, -10.6)
+rotation_degrees = Vector3(0, 180, 0)
+[node name="Model" parent="World/Infrastructure/UpperControlComputer" instance=ExtResource("20_computer")]
+position = Vector3(0, 0.002, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Infrastructure/UpperControlComputer"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Infrastructure/UpperControlComputer/Collision"]
+position = Vector3(0, 0.81, 0)
+shape = SubResource("Shape_computer")
+
+[node name="UpperAccessPoint" parent="World/Infrastructure" instance=ExtResource("21_access")]
+position = Vector3(6, 2, -10.9)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="WestVent" parent="World/Infrastructure" instance=ExtResource("25_vent")]
+position = Vector3(-11.25, 2.2, 4.2)
+rotation_degrees = Vector3(0, 0, 90)
+
+[node name="WestFan" parent="World/Infrastructure" instance=ExtResource("24_fan")]
+position = Vector3(-11.2, 2.0, -1.8)
+rotation_degrees = Vector3(0, 0, 90)
+
+[node name="ServiceCable" parent="World/Infrastructure" instance=ExtResource("26_cable")]
+position = Vector3(-8.2, 0.03, 4.2)
+rotation_degrees = Vector3(0, 16, 0)
+
+[node name="PipeColumnA" parent="World/Infrastructure" instance=ExtResource("18_column_pipes")]
+position = Vector3(-10.5, 0, -9.8)
+[node name="PipeColumnB" parent="World/Infrastructure" instance=ExtResource("18_column_pipes")]
+position = Vector3(11.1, 2, -10.7)
+
+[node name="PracticalLights" type="Node3D" parent="World/Infrastructure"]
+
+[node name="GateWideLight" type="Node3D" parent="World/Infrastructure/PracticalLights"]
+position = Vector3(0, 4.3, -11.35)
+rotation_degrees = Vector3(90, 0, 0)
+[node name="Model" parent="World/Infrastructure/PracticalLights/GateWideLight" instance=ExtResource("23_light_wide")]
+position = Vector3(0.66, 0.057, 0)
+
+[node name="UpperWideLight" type="Node3D" parent="World/Infrastructure/PracticalLights"]
+position = Vector3(8, 4.65, -11.35)
+rotation_degrees = Vector3(90, 0, 0)
+[node name="Model" parent="World/Infrastructure/PracticalLights/UpperWideLight" instance=ExtResource("23_light_wide")]
+position = Vector3(0.66, 0.057, 0)
+
+[node name="PathLightLeft" parent="World/Infrastructure/PracticalLights" instance=ExtResource("22_light_floor")]
+position = Vector3(-2, 0.03, 9.3)
+[node name="PathLightRight" parent="World/Infrastructure/PracticalLights" instance=ExtResource("22_light_floor")]
+position = Vector3(2, 0.03, 9.3)
+[node name="RampLightLeft" parent="World/Infrastructure/PracticalLights" instance=ExtResource("22_light_floor")]
+position = Vector3(7, 0.03, 0.35)
+[node name="RampLightRight" parent="World/Infrastructure/PracticalLights" instance=ExtResource("22_light_floor")]
+position = Vector3(9, 0.03, 0.35)
+
+[node name="Props" type="Node3D" parent="World"]
+
+[node name="CrateIsland" type="Node3D" parent="World/Props"]
+[node name="Crate3" type="Node3D" parent="World/Props/CrateIsland"]
+position = Vector3(5.25, 0, 6.1)
+rotation_degrees = Vector3(0, 12, 0)
+[node name="Model" parent="World/Props/CrateIsland/Crate3" instance=ExtResource("27_crate3")]
+position = Vector3(0, 0.5, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CrateIsland/Crate3"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CrateIsland/Crate3/Collision"]
+position = Vector3(0, 0.52, 0)
+shape = SubResource("Shape_crate3")
+
+[node name="Crate4" type="Node3D" parent="World/Props/CrateIsland"]
+position = Vector3(6.55, 0, 7.0)
+rotation_degrees = Vector3(0, -8, 0)
+[node name="Model" parent="World/Props/CrateIsland/Crate4" instance=ExtResource("28_crate4")]
+position = Vector3(0, 0.561, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CrateIsland/Crate4"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CrateIsland/Crate4/Collision"]
+position = Vector3(0, 0.58, 0)
+shape = SubResource("Shape_crate4")
+
+[node name="ServiceChest" type="Node3D" parent="World/Props"]
+position = Vector3(-9, 0, 8.6)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Props/ServiceChest" instance=ExtResource("29_chest")]
+position = Vector3(0, -0.003, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Props/ServiceChest"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/ServiceChest/Collision"]
+position = Vector3(0, 0.39, 0)
+shape = SubResource("Shape_chest")
+
+[node name="ServiceBarrel" type="Node3D" parent="World/Props"]
+position = Vector3(-9.5, 0, 6.8)
+[node name="Model" parent="World/Props/ServiceBarrel" instance=ExtResource("31_barrel")]
+position = Vector3(0, -0.008, 0)
+[node name="Collision" type="StaticBody3D" parent="World/Props/ServiceBarrel"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/ServiceBarrel/Collision"]
+position = Vector3(0, 0.56, 0)
+shape = SubResource("Shape_barrel")
+
+[node name="CoverRails" type="Node3D" parent="World/Props"]
+
+[node name="GroundCoverRail" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(2, 0, 8.0)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Props/CoverRails/GroundCoverRail" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/GroundCoverRail"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/GroundCoverRail/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperWestRailNorth" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(4.2, 2, -9.8)
+[node name="Model" parent="World/Props/CoverRails/UpperWestRailNorth" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperWestRailNorth"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperWestRailNorth/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperWestRailSouth" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(4.2, 2, -6.5)
+[node name="Model" parent="World/Props/CoverRails/UpperWestRailSouth" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperWestRailSouth"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperWestRailSouth/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperEastRailNorth" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(11.8, 2, -9.8)
+[node name="Model" parent="World/Props/CoverRails/UpperEastRailNorth" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperEastRailNorth"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperEastRailNorth/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperEastRailSouth" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(11.8, 2, -6.5)
+[node name="Model" parent="World/Props/CoverRails/UpperEastRailSouth" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperEastRailSouth"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperEastRailSouth/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperSouthRailWest" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(5.1, 2, -4.2)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Props/CoverRails/UpperSouthRailWest" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperSouthRailWest"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperSouthRailWest/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="UpperSouthRailEast" type="Node3D" parent="World/Props/CoverRails"]
+position = Vector3(10.9, 2, -4.2)
+rotation_degrees = Vector3(0, 90, 0)
+[node name="Model" parent="World/Props/CoverRails/UpperSouthRailEast" instance=ExtResource("30_rail")]
+position = Vector3(0, 0, 1.49)
+[node name="Collision" type="StaticBody3D" parent="World/Props/CoverRails/UpperSouthRailEast"]
+collision_layer = 1
+collision_mask = 2
+[node name="CollisionShape3D" type="CollisionShape3D" parent="World/Props/CoverRails/UpperSouthRailEast/Collision"]
+position = Vector3(0, 0.45, 0)
+shape = SubResource("Shape_rail")
+
+[node name="GameModeManager" type="Node" parent="." groups=["game_mode_manager"]]
+script = ExtResource("3_mode")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector3(0, 1.2, 10)
+
+[node name="CameraRig" parent="." instance=ExtResource("2_camera")]

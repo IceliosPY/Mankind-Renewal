@@ -1,0 +1,56 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/VisualSlice01.tscn" id="1_slice"]
+[ext_resource type="Script" path="res://Scripts/Combat/TacticalGrid.cs" id="2_grid"]
+[ext_resource type="Script" path="res://Scripts/Combat/TacticalUnit.cs" id="3_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatModeController.cs" id="4_controller"]
+
+[sub_resource type="BoxShape3D" id="Shape_pipe_column_a"]
+size = Vector3(1.2, 4, 1.2)
+
+[sub_resource type="BoxShape3D" id="Shape_pipe_column_b"]
+size = Vector3(1.2, 4, 1.2)
+
+[node name="CombatPrototype01" type="Node3D"]
+
+[node name="VisualSlice01" parent="." instance=ExtResource("1_slice")]
+
+[node name="CombatGridBlockers" type="Node3D" parent="."]
+
+[node name="PipeColumnA" type="StaticBody3D" parent="CombatGridBlockers"]
+position = Vector3(-10.5, 2, -9.8)
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CombatGridBlockers/PipeColumnA"]
+shape = SubResource("Shape_pipe_column_a")
+
+[node name="PipeColumnB" type="StaticBody3D" parent="CombatGridBlockers"]
+position = Vector3(11.1, 4, -10.7)
+collision_layer = 1
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CombatGridBlockers/PipeColumnB"]
+shape = SubResource("Shape_pipe_column_b")
+
+[node name="TacticalGrid" type="Node3D" parent="."]
+visible = false
+script = ExtResource("2_grid")
+MinimumX = -11.0
+MaximumX = 11.0
+MainFloorPath = NodePath("../VisualSlice01/World/CollisionGeometry/MainFloor")
+UpperFloorPath = NodePath("../VisualSlice01/World/CollisionGeometry/UpperFloor")
+RampLeftPath = NodePath("../VisualSlice01/World/Architecture/RampLeft/Collision")
+RampRightPath = NodePath("../VisualSlice01/World/Architecture/RampRight/Collision")
+
+[node name="TacticalUnit" type="Node" parent="."]
+script = ExtResource("3_unit")
+PlayerPath = NodePath("../VisualSlice01/Player")
+
+[node name="CombatModeController" type="Node" parent="."]
+script = ExtResource("4_controller")
+GridPath = NodePath("../TacticalGrid")
+TacticalUnitPath = NodePath("../TacticalUnit")
+PlayerPath = NodePath("../VisualSlice01/Player")
+GameModeManagerPath = NodePath("../VisualSlice01/GameModeManager")
+CameraPath = NodePath("../VisualSlice01/CameraRig/PitchPivot/SpringArm3D/Camera3D")

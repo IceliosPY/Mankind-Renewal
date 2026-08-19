@@ -1,0 +1,14 @@
+# Godot-generated editor/import/build data
+.godot/
+
+# Local .NET CLI state created by automated/headless builds
+.dotnet_cli/
+
+# IDE and operating-system files
+.vs/
+.idea/
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+

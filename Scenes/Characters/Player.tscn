@@ -1,0 +1,40 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Characters/PlayerController.cs" id="1_player"]
+[ext_resource type="Script" path="res://Scripts/Characters/ManualMovementSource.cs" id="2_manual"]
+[ext_resource type="Script" path="res://Scripts/Characters/ClickToMoveSource.cs" id="3_click"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_player"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Material_player"]
+albedo_color = Color(0.18, 0.52, 0.82, 1)
+roughness = 0.7
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
+radius = 0.45
+height = 1.8
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player")
+
+[node name="Model" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_player")
+material_override = SubResource("Material_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape_player")
+
+[node name="ManualMovement" type="Node" parent="."]
+script = ExtResource("2_manual")
+
+[node name="ClickToMove" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.35
+target_desired_distance = 0.25
+path_height_offset = -0.9
+radius = 0.45
+height = 1.8
+script = ExtResource("3_click")

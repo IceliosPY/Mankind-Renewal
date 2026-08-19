@@ -1,0 +1,54 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Characters/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" path="res://Scenes/Environment/TestFloor.tscn" id="2_floor"]
+[ext_resource type="PackedScene" path="res://Scenes/Camera/TacticalCameraRig.tscn" id="3_camera"]
+[ext_resource type="PackedScene" path="res://Scenes/Environment/Props/TestObstacle.tscn" id="4_obstacle"]
+[ext_resource type="Script" path="res://Scripts/Systems/GameModeManager.cs" id="5_mode"]
+
+[sub_resource type="Environment" id="Environment_main"]
+background_mode = 1
+background_color = Color(0.035, 0.045, 0.06, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.48, 0.56, 0.68, 1)
+ambient_light_energy = 0.55
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_test"]
+vertices = PackedVector3Array(-12, 0, -12, -2, 0, -12, 2, 0, -12, 12, 0, -12, -12, 0, -2, -2, 0, -2, 2, 0, -2, 12, 0, -2, -12, 0, 2, -2, 0, 2, 2, 0, 2, 12, 0, 2, -12, 0, 12, -2, 0, 12, 2, 0, 12, 12, 0, 12)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 5, 4), PackedInt32Array(1, 2, 6, 5), PackedInt32Array(2, 3, 7, 6), PackedInt32Array(4, 5, 9, 8), PackedInt32Array(6, 7, 11, 10), PackedInt32Array(8, 9, 13, 12), PackedInt32Array(9, 10, 14, 13), PackedInt32Array(10, 11, 15, 14)])
+agent_radius = 0.45
+agent_height = 1.8
+
+[node name="Main" type="Node3D"]
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="TestFloor" parent="Environment" instance=ExtResource("2_floor")]
+position = Vector3(0, -0.25, 0)
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="Environment"]
+navigation_mesh = SubResource("NavigationMesh_test")
+
+[node name="TestObstacles" type="Node3D" parent="Environment"]
+
+[node name="TestObstacle" parent="Environment/TestObstacles" instance=ExtResource("4_obstacle")]
+position = Vector3(0, 1, 0)
+
+[node name="Lighting" type="Node3D" parent="Environment"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment/Lighting"]
+rotation_degrees = Vector3(-55, -35, 0)
+light_color = Color(0.86, 0.91, 1, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment/Lighting"]
+environment = SubResource("Environment_main")
+
+[node name="GameModeManager" type="Node" parent="." groups=["game_mode_manager"]]
+script = ExtResource("5_mode")
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+position = Vector3(0, 1.2, 5)
+
+[node name="CameraRig" parent="." instance=ExtResource("3_camera")]
