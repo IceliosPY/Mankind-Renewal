@@ -13,6 +13,7 @@ public partial class CombatModeController : Node
     [Export] public NodePath PlayerPath { get; set; } = new();
     [Export] public NodePath GameModeManagerPath { get; set; } = new();
     [Export] public NodePath CameraPath { get; set; } = new();
+    [Export] public NodePath TargetSelectionHandlerPath { get; set; } = new();
     [Export(PropertyHint.Range, "0.5,5.0,0.1")] public float MaximumEntrySnapDistance { get; set; } = 2.2f;
     [Export] public float PlayerCenterHeight { get; set; } = 0.9f;
     [Export] public float MouseRayLength { get; set; } = 1000.0f;
@@ -27,6 +28,7 @@ public partial class CombatModeController : Node
     private GameModeManager _gameModeManager = null!;
     private Camera3D _camera = null!;
     private TurnManager? _turnManager;
+    private ICombatTargetSelectionHandler? _targetSelectionHandler;
     private readonly List<TacticalUnit> _engagedUnits = new();
     private readonly HashSet<TacticalUnit> _subscribedUnits = new();
 
@@ -38,6 +40,8 @@ public partial class CombatModeController : Node
         _gameModeManager = GetNode<GameModeManager>(GameModeManagerPath);
         _camera = GetNode<Camera3D>(CameraPath);
         _turnManager = GetTree().GetFirstNodeInGroup("turn_manager") as TurnManager;
+        if (!TargetSelectionHandlerPath.IsEmpty)
+            _targetSelectionHandler = GetNodeOrNull(TargetSelectionHandlerPath) as ICombatTargetSelectionHandler;
         SubscribeUnit(_primaryUnit);
         if (_turnManager is not null)
         {
@@ -84,6 +88,12 @@ public partial class CombatModeController : Node
 
         if (inputEvent.IsActionPressed("click_to_move") && inputEvent is InputEventMouseButton mouseButton)
         {
+            if (_targetSelectionHandler?.IsTargetSelectionActive == true)
+            {
+                _targetSelectionHandler.TrySelectTargetFromScreen(mouseButton.Position);
+                GetViewport().SetInputAsHandled();
+                return;
+            }
             UpdateHoverFromScreen(mouseButton.Position);
             TrySelectHoveredCell();
             GetViewport().SetInputAsHandled();

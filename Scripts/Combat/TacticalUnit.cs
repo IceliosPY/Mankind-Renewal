@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 using MankindRenewal.Characters;
+using MankindRenewal.Combat.Weapons;
 
 namespace MankindRenewal.Combat;
 
@@ -14,6 +15,13 @@ public partial class TacticalUnit : Node
     [Export] public bool StartAsParticipant { get; set; } = true;
     [Export(PropertyHint.Range, "0.5,12.0,0.1")] public float MovementSpeed { get; set; } = 4.0f;
     [Export] public float PlayerCenterHeight { get; set; } = 0.9f;
+
+    [ExportGroup("Combat identity and defence")]
+    [Export] public int TeamId { get; set; }
+    [Export(PropertyHint.Range, "1,10000,1")] public int MaxHealth { get; set; } = 100;
+    [Export(PropertyHint.Range, "0,1000,1")] public int BaseDodge { get; set; }
+    [Export(PropertyHint.Range, "0,1000,1")] public int BaseParry { get; set; }
+    [Export] public NodePath ActiveWeaponProviderPath { get; set; } = new();
 
     [ExportGroup("Turn economy")]
     [Export] public bool UseTurnEconomy { get; set; }
@@ -36,6 +44,8 @@ public partial class TacticalUnit : Node
     [Export] public int CurrentMovementPoints { get; private set; }
     [Export] public bool HasActedThisRound { get; private set; }
     [Export] public bool IsActiveTurn { get; private set; }
+    [Export] public int CurrentHealth { get; private set; }
+    [Export] public bool IsNeutralized { get; private set; }
 
     public TacticalCell? CurrentCell { get; private set; }
     public bool IsCombatActive { get; private set; }
@@ -45,6 +55,8 @@ public partial class TacticalUnit : Node
 
     public event Action<TacticalUnit>? InitiativeChanged;
     public event Action<TacticalUnit>? ResourcesChanged;
+    public event Action<TacticalUnit>? HealthChanged;
+    public event Action<TacticalUnit>? Neutralized;
     public event Action<TacticalCell>? CellReached;
     public event Action? PathCompleted;
 
@@ -61,6 +73,8 @@ public partial class TacticalUnit : Node
         NodePath resolvedPath = !ActorPath.IsEmpty ? ActorPath : PlayerPath;
         _actor = GetNode<Node3D>(resolvedPath);
         _player = _actor as PlayerController;
+        CurrentHealth = Mathf.Max(MaxHealth, 1);
+        IsNeutralized = false;
         AddToGroup("tactical_units");
         SetPhysicsProcess(false);
     }
@@ -108,7 +122,7 @@ public partial class TacticalUnit : Node
 
     public bool EnterCombat(TacticalCell startCell)
     {
-        if (IsCombatActive || !startCell.Walkable || !startCell.TryOccupy(_actor))
+        if (IsCombatActive || IsNeutralized || !startCell.Walkable || !startCell.TryOccupy(_actor))
             return false;
 
         if (_player is not null)
@@ -211,6 +225,49 @@ public partial class TacticalUnit : Node
         return true;
     }
 
+    public WeaponDefinition? GetActiveWeapon()
+    {
+        if (ActiveWeaponProviderPath.IsEmpty)
+            return null;
+        return GetNodeOrNull(ActiveWeaponProviderPath) is IActiveWeaponProvider provider
+            ? provider.GetActiveWeapon()
+            : null;
+    }
+
+    public int GetEffectiveDodge() => Mathf.Max(BaseDodge, 0);
+
+    public int GetEffectiveParry() => Mathf.Max(BaseParry, 0);
+
+    public int GetEffectiveAccuracy()
+    {
+        // The weapon is the sole V3 accuracy source. Future modifiers belong here.
+        return Mathf.Max(GetActiveWeapon()?.BaseAccuracy ?? 0, 0);
+    }
+
+    public int ApplyRawDamage(float rawDamage)
+    {
+        if (IsNeutralized || rawDamage <= 0.0f)
+            return 0;
+        int appliedDamage = Mathf.Max(Mathf.FloorToInt(rawDamage), 0);
+        if (appliedDamage == 0)
+            return 0;
+        CurrentHealth = Mathf.Max(CurrentHealth - appliedDamage, 0);
+        HealthChanged?.Invoke(this);
+        if (CurrentHealth == 0)
+        {
+            IsNeutralized = true;
+            Neutralized?.Invoke(this);
+        }
+        return appliedDamage;
+    }
+
+    public void RestoreFullHealth()
+    {
+        CurrentHealth = Mathf.Max(MaxHealth, 1);
+        IsNeutralized = false;
+        HealthChanged?.Invoke(this);
+    }
+
     public void CancelPath()
     {
         _path.Clear();
@@ -259,6 +316,15 @@ public partial class TacticalUnit : Node
     public bool GetIsActiveTurn() => IsActiveTurn;
     public string GetUnitDisplayName() => UnitDisplayName;
     public Vector3 GetActorWorldPosition() => _actor.GlobalPosition;
+    public int GetTeamId() => TeamId;
+    public int GetCurrentHealth() => CurrentHealth;
+    public int GetMaxHealth() => MaxHealth;
+    public int GetBaseDodge() => BaseDodge;
+    public int GetBaseParry() => BaseParry;
+    public bool GetIsNeutralized() => IsNeutralized;
+    public string GetActiveWeaponName() => GetActiveWeapon()?.DisplayName ?? string.Empty;
+    public void SetBaseDodge(int value) => BaseDodge = Mathf.Max(value, 0);
+    public void SetBaseParry(int value) => BaseParry = Mathf.Max(value, 0);
 
     private Vector3 GetActorPosition(TacticalCell cell)
     {

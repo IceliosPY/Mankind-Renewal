@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3 uid="uid://cc762pg6rtarh"]
+
+[ext_resource type="Script" uid="uid://cj8mymceq7mmk" path="res://Scripts/Combat/Weapons/WeaponDefinition.cs" id="1_weapon"]
+[ext_resource type="Script" uid="uid://d0814klglw5mb" path="res://Scripts/Combat/Weapons/DamageComponent.cs" id="2_damage"]
+
+[sub_resource type="Resource" id="Damage_ballistic"]
+script = ExtResource("2_damage")
+Amount = 18.0
+
+[resource]
+script = ExtResource("1_weapon")
+BaseAccuracy = 25
+RangeInCells = 8
+DamageComponents = Array[ExtResource("2_damage")]([SubResource("Damage_ballistic")])
+Penetration = 3.0
+ItemId = "weapon.debug_rifle"
+DisplayName = "Debug Rifle"
+Description = "Inventory V1 ranged test weapon."

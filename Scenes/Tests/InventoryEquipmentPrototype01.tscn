@@ -1,0 +1,205 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/CombatPrototype03.tscn" id="1_combat_v3"]
+[ext_resource type="Script" path="res://Scripts/Items/Inventory.cs" id="2_inventory"]
+[ext_resource type="Script" path="res://Scripts/Equipment/EquipmentLoadout.cs" id="3_equipment"]
+[ext_resource type="Script" path="res://Scripts/Equipment/EquipmentSlotDefinition.cs" id="4_slot"]
+[ext_resource type="Script" path="res://Scripts/Tests/InventoryEquipmentPrototypeSetup.cs" id="5_setup"]
+[ext_resource type="Script" path="res://Scripts/Items/InventoryEquipmentDebugPanel.cs" id="6_debug_panel"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugPistol.tres" id="7_pistol"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugBlade.tres" id="8_blade"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugRifle.tres" id="9_rifle"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugHeavyPistol.tres" id="10_heavy"]
+[ext_resource type="Resource" path="res://Data/Items/DebugUtility.tres" id="11_utility"]
+
+[sub_resource type="Resource" id="Slot_primary"]
+script = ExtResource("4_slot")
+SlotId = "weapon.primary"
+DisplayName = "Weapon Slot 1"
+SlotType = 0
+
+[sub_resource type="Resource" id="Slot_secondary"]
+script = ExtResource("4_slot")
+SlotId = "weapon.secondary"
+DisplayName = "Weapon Slot 2"
+SlotType = 0
+
+[sub_resource type="StyleBoxFlat" id="Panel_inventory"]
+bg_color = Color(0.035, 0.055, 0.075, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.28, 0.82, 0.5, 0.92)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="InventoryEquipmentPrototype01" type="Node3D"]
+
+[node name="CombatV3" parent="." instance=ExtResource("1_combat_v3")]
+editable_children = true
+
+[node name="TacticalUnit" parent="CombatV3/CombatV2/CombatV1" index="4"]
+ActiveWeaponProviderPath = NodePath("../../../../InventorySystems/UnitAEquipment")
+
+[node name="UnitB" parent="CombatV3/CombatV2" index="5"]
+ActiveWeaponProviderPath = NodePath("../../../InventorySystems/UnitBEquipment")
+
+[node name="UnitC" parent="CombatV3/CombatV2" index="6"]
+ActiveWeaponProviderPath = NodePath("../../../InventorySystems/UnitCEquipment")
+
+[node name="ReinforcementUnit" parent="CombatV3/CombatV2" index="7"]
+ActiveWeaponProviderPath = NodePath("../../../InventorySystems/UnitDEquipment")
+
+[node name="InventorySystems" type="Node" parent="."]
+
+[node name="UnitAInventory" type="Node" parent="InventorySystems"]
+script = ExtResource("2_inventory")
+
+[node name="UnitAEquipment" type="Node" parent="InventorySystems"]
+script = ExtResource("3_equipment")
+InventoryPath = NodePath("../UnitAInventory")
+TacticalUnitPath = NodePath("../../CombatV3/CombatV2/CombatV1/TacticalUnit")
+SlotDefinitions = Array[ExtResource("4_slot")]([SubResource("Slot_primary"), SubResource("Slot_secondary")])
+
+[node name="UnitBInventory" type="Node" parent="InventorySystems"]
+script = ExtResource("2_inventory")
+
+[node name="UnitBEquipment" type="Node" parent="InventorySystems"]
+script = ExtResource("3_equipment")
+InventoryPath = NodePath("../UnitBInventory")
+TacticalUnitPath = NodePath("../../CombatV3/CombatV2/UnitB")
+SlotDefinitions = Array[ExtResource("4_slot")]([SubResource("Slot_primary"), SubResource("Slot_secondary")])
+
+[node name="UnitCInventory" type="Node" parent="InventorySystems"]
+script = ExtResource("2_inventory")
+
+[node name="UnitCEquipment" type="Node" parent="InventorySystems"]
+script = ExtResource("3_equipment")
+InventoryPath = NodePath("../UnitCInventory")
+TacticalUnitPath = NodePath("../../CombatV3/CombatV2/UnitC")
+SlotDefinitions = Array[ExtResource("4_slot")]([SubResource("Slot_primary"), SubResource("Slot_secondary")])
+
+[node name="UnitDInventory" type="Node" parent="InventorySystems"]
+script = ExtResource("2_inventory")
+
+[node name="UnitDEquipment" type="Node" parent="InventorySystems"]
+script = ExtResource("3_equipment")
+InventoryPath = NodePath("../UnitDInventory")
+TacticalUnitPath = NodePath("../../CombatV3/CombatV2/ReinforcementUnit")
+SlotDefinitions = Array[ExtResource("4_slot")]([SubResource("Slot_primary"), SubResource("Slot_secondary")])
+
+[node name="PrototypeSetup" type="Node" parent="."]
+script = ExtResource("5_setup")
+DebugPistol = ExtResource("7_pistol")
+DebugBlade = ExtResource("8_blade")
+DebugRifle = ExtResource("9_rifle")
+DebugHeavyPistol = ExtResource("10_heavy")
+DebugUtility = ExtResource("11_utility")
+
+[node name="InventoryDebugUI" type="CanvasLayer" parent="."]
+
+[node name="InventoryEquipmentDebugPanel" type="PanelContainer" parent="InventoryDebugUI"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -462.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_inventory")
+script = ExtResource("6_debug_panel")
+SetupPath = NodePath("../../PrototypeSetup")
+ActionControllerPath = NodePath("../../CombatV3/CombatActionController")
+
+[node name="Margin" type="MarginContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin"]
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+text = "INVENTORY / EQUIPMENT V1 — DEBUG"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="UnitSelector" type="OptionButton" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+item_count = 0
+
+[node name="EquipmentStatus" type="Label" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(420, 100)
+theme_override_font_sizes/font_size = 13
+text = "WEAPON SLOT 1 : -\nWEAPON SLOT 2 : -\nARME ACTIVE : -"
+
+[node name="ItemSelector" type="OptionButton" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+item_count = 0
+
+[node name="SelectedItemStatus" type="Label" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(420, 74)
+theme_override_font_sizes/font_size = 12
+text = "INSTANCE SELECTIONNEE : -"
+
+[node name="EquipRow" type="HBoxContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+
+[node name="EquipPrimary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/EquipRow"]
+size_flags_horizontal = 3
+text = "EQUIPER SLOT 1"
+
+[node name="EquipSecondary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/EquipRow"]
+size_flags_horizontal = 3
+text = "EQUIPER SLOT 2"
+
+[node name="UnequipRow" type="HBoxContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+
+[node name="UnequipPrimary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/UnequipRow"]
+size_flags_horizontal = 3
+text = "DESEQUIPER 1"
+
+[node name="UnequipSecondary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/UnequipRow"]
+size_flags_horizontal = 3
+text = "DESEQUIPER 2"
+
+[node name="ActiveRow" type="HBoxContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+
+[node name="ActivePrimary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/ActiveRow"]
+size_flags_horizontal = 3
+text = "ACTIVER SLOT 1"
+
+[node name="ActiveSecondary" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/ActiveRow"]
+size_flags_horizontal = 3
+text = "ACTIVER SLOT 2"
+
+[node name="InventoryActions" type="HBoxContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+
+[node name="AddPistol" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/InventoryActions"]
+size_flags_horizontal = 3
+text = "AJOUTER PISTOLET"
+
+[node name="RemoveSelected" type="Button" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/InventoryActions"]
+size_flags_horizontal = 3
+text = "RETIRER SELECTION"
+
+[node name="OperationStatus" type="Label" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+text = "CHANGEMENT D'ARME : GRATUIT (DEBUG V1)"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+
+[node name="Separator" type="HSeparator" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+
+[node name="InventoryScroll" type="ScrollContainer" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="InventoryList" type="Label" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/InventoryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "INVENTAIRE"
+
+[editable path="CombatV3"]

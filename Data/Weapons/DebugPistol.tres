@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3 uid="uid://dq8cudm4h4gfr"]
+
+[ext_resource type="Script" uid="uid://cj8mymceq7mmk" path="res://Scripts/Combat/Weapons/WeaponDefinition.cs" id="1_weapon"]
+[ext_resource type="Script" uid="uid://d0814klglw5mb" path="res://Scripts/Combat/Weapons/DamageComponent.cs" id="2_damage"]
+
+[sub_resource type="Resource" id="Damage_ballistic"]
+script = ExtResource("2_damage")
+Amount = 20.0
+
+[resource]
+script = ExtResource("1_weapon")
+RangeInCells = 6
+DamageComponents = Array[ExtResource("2_damage")]([SubResource("Damage_ballistic")])
+Penetration = 2.0
+ItemId = "weapon.debug_pistol"
+DisplayName = "Debug Pistol"
+Description = "Combat V3 deterministic ranged test weapon."

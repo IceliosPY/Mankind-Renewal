@@ -1,0 +1,237 @@
+[gd_scene format=3 uid="uid://du835kn01bxaj"]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/InventoryEquipmentPrototype01.tscn" id="1_n7kcj"]
+
+[node name="InventoryEquipmentPrototype01" unique_id=1156316769 instance=ExtResource("1_n7kcj")]
+
+[node name="PipeColumnA" parent="CombatV3/CombatV2/CombatV1/CombatGridBlockers" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 2, -9.8)
+
+[node name="PipeColumnB" parent="CombatV3/CombatV2/CombatV1/CombatGridBlockers" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.1, 4, -10.7)
+
+[node name="UnitBActor" parent="CombatV3/CombatV2" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.9, 9)
+
+[node name="UnitCActor" parent="CombatV3/CombatV2" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.9, 9)
+
+[node name="ReinforcementActor" parent="CombatV3/CombatV2" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.9, 9)
+
+[node name="CombatDebugPanel" parent="CombatV3/CombatV2/DebugUI" index="0"]
+anchors_preset = 9
+
+[node name="Margin" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel" index="0"]
+layout_mode = 2
+
+[node name="VBox" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin" index="0"]
+layout_mode = 2
+
+[node name="Title" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox" index="0"]
+layout_mode = 2
+
+[node name="Status" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox" index="1"]
+layout_mode = 2
+
+[node name="EndTurn" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox" index="2"]
+layout_mode = 2
+
+[node name="PrimarySecondarySeparator" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox" index="3"]
+layout_mode = 2
+
+[node name="SecondaryScroll" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox" index="4"]
+layout_mode = 2
+
+[node name="SpendActionPoint" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="0"]
+layout_mode = 2
+
+[node name="InitiativeLabel" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="1"]
+layout_mode = 2
+
+[node name="InitiativeTarget" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="2"]
+layout_mode = 2
+
+[node name="InitiativeTargetStatus" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="3"]
+layout_mode = 2
+
+[node name="InitiativeRow" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="4"]
+layout_mode = 2
+
+[node name="DecreaseTarget" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow" index="0"]
+layout_mode = 2
+
+[node name="IncreaseTarget" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow" index="1"]
+layout_mode = 2
+
+[node name="ReinforcementLabel" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="5"]
+layout_mode = 2
+
+[node name="ReinforcementRow" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="6"]
+layout_mode = 2
+
+[node name="AddReinforcement" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow" index="0"]
+layout_mode = 2
+
+[node name="RemoveReinforcement" parent="CombatV3/CombatV2/DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow" index="1"]
+layout_mode = 2
+
+[node name="CombatV3DebugPanel" parent="CombatV3/DebugUI" index="0"]
+anchors_preset = 9
+
+[node name="Margin" parent="CombatV3/DebugUI/CombatV3DebugPanel" index="0"]
+layout_mode = 2
+
+[node name="VBox" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin" index="0"]
+layout_mode = 2
+
+[node name="Title" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="0"]
+layout_mode = 2
+
+[node name="Status" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="1"]
+layout_mode = 2
+
+[node name="AttackRow" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="2"]
+layout_mode = 2
+
+[node name="Attack" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/AttackRow" index="0"]
+layout_mode = 2
+
+[node name="Declare" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/AttackRow" index="1"]
+layout_mode = 2
+
+[node name="TargetSelector" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="3"]
+layout_mode = 2
+
+[node name="TargetStatus" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="4"]
+layout_mode = 2
+
+[node name="ReactionBox" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="5"]
+layout_mode = 2
+
+[node name="ReactionLabel" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox" index="0"]
+layout_mode = 2
+
+[node name="ReactionRow" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox" index="1"]
+layout_mode = 2
+
+[node name="Accept" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox/ReactionRow" index="0"]
+layout_mode = 2
+
+[node name="Refuse" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox/ReactionRow" index="1"]
+layout_mode = 2
+
+[node name="EndTurn" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="6"]
+layout_mode = 2
+
+[node name="Separator" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="7"]
+layout_mode = 2
+
+[node name="SecondaryScroll" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox" index="8"]
+layout_mode = 2
+
+[node name="SpendActionPoint" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="0"]
+layout_mode = 2
+
+[node name="InitiativeLabel" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="1"]
+layout_mode = 2
+
+[node name="InitiativeTarget" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="2"]
+layout_mode = 2
+
+[node name="InitiativeStatus" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="3"]
+layout_mode = 2
+
+[node name="InitiativeRow" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="4"]
+layout_mode = 2
+
+[node name="Decrease" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow" index="0"]
+layout_mode = 2
+
+[node name="Increase" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow" index="1"]
+layout_mode = 2
+
+[node name="ReinforcementLabel" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="5"]
+layout_mode = 2
+
+[node name="ReinforcementRow" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls" index="6"]
+layout_mode = 2
+
+[node name="Add" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow" index="0"]
+layout_mode = 2
+
+[node name="Remove" parent="CombatV3/DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow" index="1"]
+layout_mode = 2
+
+[node name="InventoryEquipmentDebugPanel" parent="InventoryDebugUI" index="0"]
+anchors_preset = 11
+
+[node name="Margin" parent="InventoryDebugUI/InventoryEquipmentDebugPanel" index="0"]
+layout_mode = 2
+
+[node name="VBox" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin" index="0"]
+layout_mode = 2
+
+[node name="Title" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="0"]
+layout_mode = 2
+
+[node name="UnitSelector" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="1"]
+layout_mode = 2
+
+[node name="EquipmentStatus" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="2"]
+layout_mode = 2
+
+[node name="ItemSelector" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="3"]
+layout_mode = 2
+
+[node name="SelectedItemStatus" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="4"]
+layout_mode = 2
+
+[node name="EquipRow" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="5"]
+layout_mode = 2
+
+[node name="EquipPrimary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/EquipRow" index="0"]
+layout_mode = 2
+
+[node name="EquipSecondary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/EquipRow" index="1"]
+layout_mode = 2
+
+[node name="UnequipRow" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="6"]
+layout_mode = 2
+
+[node name="UnequipPrimary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/UnequipRow" index="0"]
+layout_mode = 2
+
+[node name="UnequipSecondary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/UnequipRow" index="1"]
+layout_mode = 2
+
+[node name="ActiveRow" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="7"]
+layout_mode = 2
+
+[node name="ActivePrimary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/ActiveRow" index="0"]
+layout_mode = 2
+
+[node name="ActiveSecondary" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/ActiveRow" index="1"]
+layout_mode = 2
+
+[node name="InventoryActions" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="8"]
+layout_mode = 2
+
+[node name="AddPistol" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/InventoryActions" index="0"]
+layout_mode = 2
+
+[node name="RemoveSelected" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox/InventoryActions" index="1"]
+layout_mode = 2
+
+[node name="OperationStatus" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="9"]
+layout_mode = 2
+
+[node name="Separator" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="10"]
+layout_mode = 2
+
+[node name="InventoryScroll" parent="InventoryDebugUI/InventoryEquipmentDebugPanel/Margin/VBox" index="11"]
+layout_mode = 2
+
+[editable path="CombatV3"]
+[editable path="CombatV3/CombatV2"]
+[editable path="CombatV3/CombatV2/CombatV1"]

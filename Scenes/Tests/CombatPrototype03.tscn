@@ -1,0 +1,239 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/CombatPrototype02.tscn" id="1_combat_v2"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatActionController.cs" id="2_action_controller"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV3DebugPanel.cs" id="3_debug_panel"]
+[ext_resource type="Script" path="res://Scripts/Combat/Weapons/UnitWeaponLoadout.cs" id="4_loadout"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugPistol.tres" id="5_pistol"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugBlade.tres" id="6_blade"]
+
+[sub_resource type="StandardMaterial3D" id="Material_target"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.72, 0.08, 0.72)
+emission_enabled = true
+emission = Color(1, 0.38, 0.04, 1)
+
+[sub_resource type="CylinderMesh" id="Mesh_target"]
+material = SubResource("Material_target")
+top_radius = 0.72
+bottom_radius = 0.72
+height = 0.06
+radial_segments = 32
+
+[sub_resource type="StyleBoxFlat" id="Panel_debug"]
+bg_color = Color(0.025, 0.04, 0.075, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.45, 0.12, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="Label_status"]
+font_size = 13
+font_color = Color(0.88, 0.95, 1, 1)
+
+[node name="CombatPrototype03" type="Node3D"]
+
+[node name="CombatV2" parent="." instance=ExtResource("1_combat_v2")]
+editable_children = true
+
+[node name="CombatDebugPanel" parent="CombatV2/DebugUI" index="0"]
+visible = false
+process_mode = 4
+
+[node name="TacticalUnit" parent="CombatV2/CombatV1" index="4"]
+TeamId = 1
+MaxHealth = 100
+BaseDodge = 10
+BaseParry = 20
+ActiveWeaponProviderPath = NodePath("../../../UnitALoadout")
+
+[node name="CombatModeController" parent="CombatV2/CombatV1" index="5"]
+TargetSelectionHandlerPath = NodePath("../../../CombatActionController")
+
+[node name="UnitBActor" parent="CombatV2" index="2"]
+position = Vector3(2, 0.9, 9)
+
+[node name="UnitCActor" parent="CombatV2" index="3"]
+position = Vector3(4, 0.9, 9)
+
+[node name="ReinforcementActor" parent="CombatV2" index="4"]
+position = Vector3(6, 0.9, 9)
+
+[node name="UnitB" parent="CombatV2" index="5"]
+TeamId = 2
+MaxHealth = 100
+BaseDodge = 25
+BaseParry = 10
+MaxMovementPoints = 20
+ActiveWeaponProviderPath = NodePath("../../UnitBLoadout")
+
+[node name="UnitC" parent="CombatV2" index="6"]
+TeamId = 1
+MaxHealth = 100
+BaseDodge = 20
+BaseParry = 25
+ActiveWeaponProviderPath = NodePath("../../UnitCLoadout")
+
+[node name="ReinforcementUnit" parent="CombatV2" index="7"]
+TeamId = 2
+MaxHealth = 100
+BaseDodge = 10
+BaseParry = 20
+ActiveWeaponProviderPath = NodePath("../../UnitDLoadout")
+
+[node name="UnitALoadout" type="Node" parent="."]
+script = ExtResource("4_loadout")
+ActiveWeapon = ExtResource("5_pistol")
+
+[node name="UnitBLoadout" type="Node" parent="."]
+script = ExtResource("4_loadout")
+ActiveWeapon = ExtResource("6_blade")
+
+[node name="UnitCLoadout" type="Node" parent="."]
+script = ExtResource("4_loadout")
+ActiveWeapon = ExtResource("6_blade")
+
+[node name="UnitDLoadout" type="Node" parent="."]
+script = ExtResource("4_loadout")
+ActiveWeapon = ExtResource("5_pistol")
+
+[node name="TargetMarker" type="Node3D" parent="."]
+visible = false
+
+[node name="Mesh" type="MeshInstance3D" parent="TargetMarker"]
+mesh = SubResource("Mesh_target")
+cast_shadow = 0
+
+[node name="CombatActionController" type="Node" parent="."]
+script = ExtResource("2_action_controller")
+TurnManagerPath = NodePath("../CombatV2/TurnManager")
+CombatControllerPath = NodePath("../CombatV2/CombatV1/CombatModeController")
+CameraPath = NodePath("../CombatV2/CombatV1/VisualSlice01/CameraRig/PitchPivot/SpringArm3D/Camera3D")
+TargetMarkerPath = NodePath("../TargetMarker")
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+
+[node name="CombatV3DebugPanel" type="PanelContainer" parent="DebugUI"]
+visible = false
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 432.0
+offset_bottom = -12.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_debug")
+script = ExtResource("3_debug_panel")
+TurnManagerPath = NodePath("../../CombatV2/TurnManager")
+CombatControllerPath = NodePath("../../CombatV2/CombatV1/CombatModeController")
+ActionControllerPath = NodePath("../../CombatActionController")
+ReinforcementUnitPath = NodePath("../../CombatV2/ReinforcementUnit")
+
+[node name="Margin" type="MarginContainer" parent="DebugUI/CombatV3DebugPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin"]
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+text = "COMBAT V3 — DEBUG"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 19
+
+[node name="Status" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(380, 210)
+label_settings = SubResource("Label_status")
+text = "ROUND : 0"
+
+[node name="AttackRow" type="HBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+
+[node name="Attack" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/AttackRow"]
+size_flags_horizontal = 3
+text = "ATTAQUER"
+
+[node name="Declare" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/AttackRow"]
+size_flags_horizontal = 3
+text = "DECLARER"
+
+[node name="TargetSelector" type="OptionButton" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+item_count = 0
+
+[node name="TargetStatus" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(380, 66)
+theme_override_font_sizes/font_size = 13
+text = "CIBLE : -"
+
+[node name="ReactionBox" type="VBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+visible = false
+
+[node name="ReactionLabel" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox"]
+text = "REACTION DISPONIBLE"
+
+[node name="ReactionRow" type="HBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox"]
+
+[node name="Accept" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox/ReactionRow"]
+size_flags_horizontal = 3
+text = "ESQUIVER / PARER"
+
+[node name="Refuse" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/ReactionBox/ReactionRow"]
+size_flags_horizontal = 3
+text = "REFUSER"
+
+[node name="EndTurn" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+text = "FIN DU TOUR"
+
+[node name="Separator" type="HSeparator" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+
+[node name="SecondaryScroll" type="ScrollContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SecondaryControls" type="VBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="SpendActionPoint" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "DEPENSER 1 PA (DEBUG)"
+
+[node name="InitiativeLabel" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "CIBLE INITIATIVE DEBUG"
+
+[node name="InitiativeTarget" type="OptionButton" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+item_count = 0
+
+[node name="InitiativeStatus" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "CIBLE INITIATIVE : -"
+
+[node name="InitiativeRow" type="HBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+
+[node name="Decrease" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow"]
+size_flags_horizontal = 3
+text = "-10"
+
+[node name="Increase" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow"]
+size_flags_horizontal = 3
+text = "+10"
+
+[node name="ReinforcementLabel" type="Label" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "RENFORT DEBUG"
+
+[node name="ReinforcementRow" type="HBoxContainer" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+
+[node name="Add" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow"]
+size_flags_horizontal = 3
+text = "AJOUTER D"
+
+[node name="Remove" type="Button" parent="DebugUI/CombatV3DebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow"]
+size_flags_horizontal = 3
+text = "RETIRER D"
+
+[editable path="CombatV2"]
