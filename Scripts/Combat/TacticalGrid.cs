@@ -39,11 +39,16 @@ public partial class TacticalGrid : Node3D
     private readonly HashSet<CollisionObject3D> _walkableSurfaces = new();
     private readonly Godot.Collections.Array<Rid> _surfaceRids = new();
     private readonly HashSet<TacticalCell> _pathCells = new();
+    private readonly HashSet<TacticalCell> _reachableCells = new();
+    private bool _showReachability;
     private TacticalCell? _hoveredCell;
     private TacticalCell? _currentCell;
     private TacticalCell? _destinationCell;
 
     private static readonly Color DefaultColor = new(0.08f, 0.58f, 0.82f, 0.34f);
+    private static readonly Color ReachableColor = new(0.08f, 0.82f, 0.64f, 0.56f);
+    private static readonly Color InaccessibleColor = new(0.08f, 0.12f, 0.18f, 0.16f);
+    private static readonly Color OccupiedColor = new(0.72f, 0.18f, 0.9f, 0.7f);
     private static readonly Color PathColor = new(0.14f, 0.48f, 1.0f, 0.55f);
     private static readonly Color CurrentColor = new(0.12f, 0.95f, 0.4f, 0.64f);
     private static readonly Color DestinationColor = new(1.0f, 0.28f, 0.58f, 0.72f);
@@ -136,6 +141,14 @@ public partial class TacticalGrid : Node3D
 
     public bool GetCellIsOccupied(int cellId) => GetCellById(cellId)?.IsOccupied ?? false;
 
+    public bool GetCellIsReachable(int cellId)
+    {
+        TacticalCell? cell = GetCellById(cellId);
+        return cell is not null && _reachableCells.Contains(cell);
+    }
+
+    public int GetReachableCellCount() => _reachableCells.Count;
+
     public int GetPathLengthBetweenCells(int fromCellId, int toCellId)
     {
         TacticalCell? from = GetCellById(fromCellId);
@@ -184,6 +197,22 @@ public partial class TacticalGrid : Node3D
     {
         _pathCells.Clear();
         _destinationCell = null;
+        RefreshDebugColors();
+    }
+
+    public void ShowReachableCells(IEnumerable<TacticalCell> cells)
+    {
+        _reachableCells.Clear();
+        foreach (TacticalCell cell in cells)
+            _reachableCells.Add(cell);
+        _showReachability = true;
+        RefreshDebugColors();
+    }
+
+    public void ClearReachableCells()
+    {
+        _reachableCells.Clear();
+        _showReachability = false;
         RefreshDebugColors();
     }
 
@@ -308,7 +337,11 @@ public partial class TacticalGrid : Node3D
     {
         foreach (TacticalCell cell in _cells)
         {
-            Color color = DefaultColor;
+            Color color = _showReachability
+                ? (_reachableCells.Contains(cell) ? ReachableColor : InaccessibleColor)
+                : DefaultColor;
+            if (cell.IsOccupied)
+                color = OccupiedColor;
             if (_pathCells.Contains(cell))
                 color = PathColor;
             if (cell == _destinationCell)

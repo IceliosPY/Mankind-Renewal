@@ -1,0 +1,194 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/CombatPrototype01.tscn" id="1_combat_v1"]
+[ext_resource type="Script" path="res://Scripts/Combat/TurnManager.cs" id="2_turn_manager"]
+[ext_resource type="Script" path="res://Scripts/Combat/TacticalUnit.cs" id="3_tactical_unit"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatDebugPanel.cs" id="4_debug_panel"]
+[ext_resource type="Script" path="res://Scripts/Systems/WindowDisplayController.cs" id="5_window_display"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_unit"]
+radius = 0.45
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Material_unit_b"]
+albedo_color = Color(0.95, 0.4, 0.12, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Material_unit_c"]
+albedo_color = Color(0.58, 0.24, 0.92, 1)
+roughness = 0.65
+
+[sub_resource type="StandardMaterial3D" id="Material_unit_d"]
+albedo_color = Color(0.14, 0.86, 0.34, 1)
+roughness = 0.65
+
+[sub_resource type="StyleBoxFlat" id="Panel_debug"]
+bg_color = Color(0.025, 0.04, 0.075, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.12, 0.58, 0.82, 0.9)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="LabelSettings" id="LabelSettings_status"]
+font_size = 16
+font_color = Color(0.86, 0.94, 1, 1)
+
+[node name="CombatPrototype02" type="Node3D"]
+
+[node name="WindowDisplayController" type="Node" parent="."]
+script = ExtResource("5_window_display")
+
+[node name="TurnManager" type="Node" parent="."]
+script = ExtResource("2_turn_manager")
+RandomSeed = 424242
+
+[node name="CombatV1" parent="." instance=ExtResource("1_combat_v1")]
+editable_children = true
+
+[node name="TacticalUnit" parent="CombatV1" index="4"]
+UnitDisplayName = "UNITE A"
+UseTurnEconomy = true
+Initiative = 30
+MaxActionPoints = 2
+MaxMovementPoints = 6
+
+[node name="UnitBActor" type="Node3D" parent="."]
+position = Vector3(8, 0.9, 1)
+
+[node name="Model" type="MeshInstance3D" parent="UnitBActor"]
+mesh = SubResource("CapsuleMesh_unit")
+material_override = SubResource("Material_unit_b")
+
+[node name="UnitCActor" type="Node3D" parent="."]
+position = Vector3(-8, 0.9, 9)
+
+[node name="Model" type="MeshInstance3D" parent="UnitCActor"]
+mesh = SubResource("CapsuleMesh_unit")
+material_override = SubResource("Material_unit_c")
+
+[node name="ReinforcementActor" type="Node3D" parent="."]
+visible = false
+position = Vector3(4, 0.9, 9)
+
+[node name="Model" type="MeshInstance3D" parent="ReinforcementActor"]
+mesh = SubResource("CapsuleMesh_unit")
+material_override = SubResource("Material_unit_d")
+
+[node name="UnitB" type="Node" parent="."]
+script = ExtResource("3_tactical_unit")
+ActorPath = NodePath("../UnitBActor")
+UnitDisplayName = "UNITE B"
+UseTurnEconomy = true
+Initiative = 20
+MaxActionPoints = 2
+MaxMovementPoints = 8
+
+[node name="UnitC" type="Node" parent="."]
+script = ExtResource("3_tactical_unit")
+ActorPath = NodePath("../UnitCActor")
+UnitDisplayName = "UNITE C"
+UseTurnEconomy = true
+Initiative = 10
+MaxActionPoints = 2
+MaxMovementPoints = 7
+
+[node name="ReinforcementUnit" type="Node" parent="."]
+script = ExtResource("3_tactical_unit")
+ActorPath = NodePath("../ReinforcementActor")
+UnitDisplayName = "UNITE D"
+StartAsParticipant = false
+UseTurnEconomy = true
+Initiative = 100
+MaxActionPoints = 2
+MaxMovementPoints = 6
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+
+[node name="CombatDebugPanel" type="PanelContainer" parent="DebugUI"]
+visible = false
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 374.0
+offset_bottom = -12.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_debug")
+script = ExtResource("4_debug_panel")
+TurnManagerPath = NodePath("../../TurnManager")
+CombatControllerPath = NodePath("../../CombatV1/CombatModeController")
+ReinforcementUnitPath = NodePath("../../ReinforcementUnit")
+
+[node name="Margin" type="MarginContainer" parent="DebugUI/CombatDebugPanel"]
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="DebugUI/CombatDebugPanel/Margin"]
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="DebugUI/CombatDebugPanel/Margin/VBox"]
+text = "COMBAT V2 — DEBUG"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="Status" type="Label" parent="DebugUI/CombatDebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(300, 225)
+label_settings = SubResource("LabelSettings_status")
+text = "ROUND : 0"
+
+[node name="EndTurn" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox"]
+text = "FIN DU TOUR"
+
+[node name="PrimarySecondarySeparator" type="HSeparator" parent="DebugUI/CombatDebugPanel/Margin/VBox"]
+
+[node name="SecondaryScroll" type="ScrollContainer" parent="DebugUI/CombatDebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SecondaryControls" type="VBoxContainer" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="SpendActionPoint" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "DEPENSER 1 PA (DEBUG)"
+
+[node name="InitiativeLabel" type="Label" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "CIBLE INITIATIVE DEBUG"
+
+[node name="InitiativeTarget" type="OptionButton" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+item_count = 0
+
+[node name="InitiativeTargetStatus" type="Label" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "CIBLE : -\nInitiative : 0\nPosition : -"
+
+[node name="InitiativeRow" type="HBoxContainer" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+
+[node name="DecreaseTarget" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow"]
+size_flags_horizontal = 3
+text = "-10"
+
+[node name="IncreaseTarget" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/InitiativeRow"]
+size_flags_horizontal = 3
+text = "+10"
+
+[node name="ReinforcementLabel" type="Label" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+text = "RENFORT DEBUG"
+
+[node name="ReinforcementRow" type="HBoxContainer" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls"]
+
+[node name="AddReinforcement" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow"]
+size_flags_horizontal = 3
+text = "AJOUTER D"
+
+[node name="RemoveReinforcement" type="Button" parent="DebugUI/CombatDebugPanel/Margin/VBox/SecondaryScroll/SecondaryControls/ReinforcementRow"]
+size_flags_horizontal = 3
+text = "RETIRER D"
+
+[editable path="CombatV1"]

@@ -8,8 +8,18 @@ public static class TacticalPathfinder
 {
     public static List<TacticalCell> FindPath(TacticalCell start, TacticalCell goal)
     {
+        return FindPath(start, goal, (from, to) => from.WorldPosition.DistanceTo(to.WorldPosition));
+    }
+
+    public static List<TacticalCell> FindPath(
+        TacticalCell start,
+        TacticalCell goal,
+        Func<TacticalCell, TacticalCell, float> transitionCost)
+    {
         if (start == goal)
             return new List<TacticalCell> { start };
+        if (goal.IsOccupied)
+            return new List<TacticalCell>();
 
         PriorityQueue<TacticalCell, float> frontier = new();
         Dictionary<TacticalCell, TacticalCell?> cameFrom = new() { [start] = null };
@@ -24,28 +34,55 @@ public static class TacticalPathfinder
 
             foreach (TacticalCell neighbor in current.Neighbors)
             {
-                if (!neighbor.Walkable || (neighbor.IsOccupied && neighbor != goal))
+                if (!neighbor.Walkable || (neighbor.IsOccupied && neighbor != start))
                     continue;
 
-                float stepCost = current.WorldPosition.DistanceTo(neighbor.WorldPosition);
-                float newCost = costSoFar[current] + stepCost;
+                float newCost = costSoFar[current] + Mathf.Max(transitionCost(current, neighbor), 0.0f);
                 if (costSoFar.TryGetValue(neighbor, out float previousCost) && newCost >= previousCost)
                     continue;
 
                 costSoFar[neighbor] = newCost;
                 cameFrom[neighbor] = current;
-                float priority = newCost + Heuristic(neighbor, goal);
-                frontier.Enqueue(neighbor, priority);
+                frontier.Enqueue(neighbor, newCost + Heuristic(neighbor, goal));
             }
         }
 
         return new List<TacticalCell>();
     }
 
+    public static Dictionary<TacticalCell, int> FindReachableCells(
+        TacticalCell start,
+        int movementBudget,
+        Func<TacticalCell, TacticalCell, int> transitionCost)
+    {
+        Dictionary<TacticalCell, int> costs = new() { [start] = 0 };
+        PriorityQueue<TacticalCell, int> frontier = new();
+        frontier.Enqueue(start, 0);
+
+        while (frontier.Count > 0)
+        {
+            TacticalCell current = frontier.Dequeue();
+            int currentCost = costs[current];
+            foreach (TacticalCell neighbor in current.Neighbors)
+            {
+                if (!neighbor.Walkable || (neighbor.IsOccupied && neighbor != start))
+                    continue;
+                int newCost = currentCost + Mathf.Max(transitionCost(current, neighbor), 1);
+                if (newCost > movementBudget)
+                    continue;
+                if (costs.TryGetValue(neighbor, out int previousCost) && newCost >= previousCost)
+                    continue;
+                costs[neighbor] = newCost;
+                frontier.Enqueue(neighbor, newCost);
+            }
+        }
+
+        return costs;
+    }
+
     private static float Heuristic(TacticalCell from, TacticalCell to)
     {
-        int horizontal = Math.Abs(from.GridX - to.GridX) + Math.Abs(from.GridZ - to.GridZ);
-        return horizontal + Math.Abs(from.SurfaceHeight - to.SurfaceHeight);
+        return Math.Abs(from.GridX - to.GridX) + Math.Abs(from.GridZ - to.GridZ);
     }
 
     private static List<TacticalCell> ReconstructPath(
