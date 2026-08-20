@@ -64,9 +64,11 @@ func _run() -> void:
 	var pistol_a_id := str(setup.call("GetUnitAPistolAId"))
 	var pistol_b_id := str(setup.call("GetUnitAPistolBId"))
 	var blade_id := str(setup.call("GetUnitABladeId"))
+	var utility_id := str(setup.call("GetUnitADebugUtilityId"))
 	var pistol_a: Variant = a_inventory.call("FindByInstanceId", pistol_a_id)
 	var pistol_b: Variant = a_inventory.call("FindByInstanceId", pistol_b_id)
 	var blade: Variant = a_inventory.call("FindByInstanceId", blade_id)
+	var utility: Variant = a_inventory.call("FindByInstanceId", utility_id)
 	_check(not pistol_a_id.is_empty() and not pistol_b_id.is_empty() and pistol_a_id != pistol_b_id, "Deux DebugPistol recoivent des InstanceId uniques")
 	_check(pistol_a != null and pistol_b != null and blade != null, "Les instances initiales sont recherchables par identifiant")
 	_check(str(pistol_a.call("GetDefinitionId")) == "weapon.debug_pistol" and str(pistol_b.call("GetDefinitionId")) == "weapon.debug_pistol", "Les deux pistolets partagent le meme DefinitionId stable")
@@ -74,7 +76,7 @@ func _run() -> void:
 	_check(bool(pistol_a.call("GetIsValidInstance")) and bool(pistol_b.call("GetIsValidInstance")), "Les ItemInstance initiales sont valides")
 
 	# Inventory authority, duplicates, lookup, removal, isolation.
-	_check(int(a_inventory.call("GetItemCount")) == 4 and int(b_inventory.call("GetItemCount")) == 2, "Les inventaires A et B sont separes")
+	_check(int(a_inventory.call("GetItemCount")) == 5 and int(b_inventory.call("GetItemCount")) == 2, "Les inventaires A et B sont separes et DebugUtility appartient a A")
 	_check(not bool(a_inventory.call("AddItem", pistol_a)), "La meme instance ne peut pas etre ajoutee deux fois")
 	_check(not bool(b_inventory.call("AddItem", pistol_a)), "Une instance deja possedee ne peut pas appartenir a deux inventaires")
 	var duplicate_id: Variant = setup.call("CreateLooseInstance", "weapon.debug_pistol")
@@ -97,9 +99,12 @@ func _run() -> void:
 	# Ownership and compatibility validation.
 	var non_owned_pistol: Variant = setup.call("CreateLooseInstance", "weapon.debug_pistol")
 	_check(not bool(a_loadout.call("Equip", non_owned_pistol, PRIMARY)), "Un objet non possede ne peut pas etre equipe")
-	var utility: Variant = setup.call("CreateAndAdd", "UNITE A", "utility.debug_scanner")
-	_check(utility != null and not bool(a_loadout.call("Equip", utility, PRIMARY)), "Un ItemDefinition non arme est incompatible avec un slot d'arme")
-	_check(bool(a_inventory.call("RemoveItem", utility)), "L'objet incompatible reste une instance normale retirable")
+	var primary_before_utility := str(a_loadout.call("GetEquippedInstanceId", PRIMARY))
+	var secondary_before_utility := str(a_loadout.call("GetEquippedInstanceId", SECONDARY))
+	_check(utility != null and str(utility.call("GetDefinitionId")) == "utility.debug_scanner" and not utility_id.is_empty(), "DebugUtility conserve sa vraie ItemDefinition et son InstanceId")
+	_check(not bool(a_loadout.call("IsEquipped", utility)), "DebugUtility n'est equipee dans aucun slot au demarrage")
+	_check(not bool(a_loadout.call("Equip", utility, PRIMARY)) and not bool(a_loadout.call("Equip", utility, SECONDARY)), "DebugUtility est refusee par les deux slots d'arme")
+	_check(str(a_loadout.call("GetEquippedInstanceId", PRIMARY)) == primary_before_utility and str(a_loadout.call("GetEquippedInstanceId", SECONDARY)) == secondary_before_utility, "Les deux slots restent inchanges apres les refus")
 
 	# Unequip policy: active falls back to another occupied weapon, then none.
 	_check(bool(a_loadout.call("Unequip", PRIMARY)) and str(a_loadout.call("GetActiveSlotId")) == SECONDARY, "Desequiper l'arme active selectionne l'autre arme equipee")
@@ -118,7 +123,8 @@ func _run() -> void:
 
 	# Debug UI: multiple units, instances, add/remove and equipped-state safety.
 	await _wait_physics_frames(4)
-	_check(bool(inventory_panel.call("SelectUnitByName", "UNITE A")) and int(inventory_panel.call("GetDisplayedItemCount")) == 3, "L'UI inspecte l'inventaire propre de A")
+	_check(bool(inventory_panel.call("SelectUnitByName", "UNITE A")) and int(inventory_panel.call("GetDisplayedItemCount")) == 4, "L'UI inspecte l'inventaire propre de A avec DebugUtility")
+	_check(bool(inventory_panel.call("SelectItemByInstanceId", utility_id)) and "Debug Scanner" in str(inventory_panel.call("GetSelectedItemStatusText")), "DebugUtility est selectionnable dans l'interface DEBUG")
 	_check("weapon.debug_pistol" in str(inventory_panel.call("GetInventoryListText")) and "EQUIPE SLOT 1" in str(inventory_panel.call("GetInventoryListText")), "L'UI affiche DefinitionId, InstanceId abrege et etat equipe")
 	_check(bool(inventory_panel.call("SelectUnitByName", "UNITE B")) and int(inventory_panel.call("GetDisplayedItemCount")) == 2, "Changer d'unite affiche uniquement l'inventaire de B")
 	inventory_panel.call("SelectUnitByName", "UNITE A")
@@ -177,7 +183,7 @@ func _run() -> void:
 
 	controller.call("ExitCombat")
 	await _wait_physics_frames(3)
-	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/CombatPrototype03.tscn", "La scene principale reste celle validee avant Inventory V1")
+	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/InventoryEquipmentPrototype01.tscn", "La scene principale reste le prototype Inventory V1 valide")
 
 	prototype.queue_free()
 	await process_frame

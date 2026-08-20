@@ -21,6 +21,7 @@ public partial class InventoryEquipmentPrototypeSetup : Node
     public ItemInstance? UnitAPistolA { get; private set; }
     public ItemInstance? UnitAPistolB { get; private set; }
     public ItemInstance? UnitABlade { get; private set; }
+    public ItemInstance? UnitADebugUtility { get; private set; }
 
     private readonly List<ItemDefinition> _testDefinitions = new();
 
@@ -47,6 +48,8 @@ public partial class InventoryEquipmentPrototypeSetup : Node
         UnitAPistolB = Add(unitA.Inventory, DebugPistol);
         UnitABlade = Add(unitA.Inventory, DebugBlade);
         Add(unitA.Inventory, DebugRifle);
+        if (DebugUtility is not null)
+            UnitADebugUtility = Add(unitA.Inventory, DebugUtility);
         unitA.Equip(UnitAPistolA, PrimaryWeaponSlotId);
         unitA.Equip(UnitABlade, SecondaryWeaponSlotId);
         unitA.SetActiveSlot(PrimaryWeaponSlotId);
@@ -98,6 +101,7 @@ public partial class InventoryEquipmentPrototypeSetup : Node
     public string GetUnitAPistolAId() => UnitAPistolA?.InstanceId ?? string.Empty;
     public string GetUnitAPistolBId() => UnitAPistolB?.InstanceId ?? string.Empty;
     public string GetUnitABladeId() => UnitABlade?.InstanceId ?? string.Empty;
+    public string GetUnitADebugUtilityId() => UnitADebugUtility?.InstanceId ?? string.Empty;
 
     private static ItemInstance Add(Inventory inventory, ItemDefinition definition)
     {
