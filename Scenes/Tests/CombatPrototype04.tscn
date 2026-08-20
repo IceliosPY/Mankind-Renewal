@@ -1,0 +1,215 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/InventoryEquipmentPrototype01.tscn" id="1_inventory_v1"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV4ActionController.cs" id="2_v4_controller"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV4DebugPanel.cs" id="3_v4_panel"]
+[ext_resource type="Script" path="res://Scripts/Combat/Reactions/UnitReactionLoadout.cs" id="4_reaction_loadout"]
+[ext_resource type="Script" path="res://Scripts/Tests/CombatPrototype04Setup.cs" id="5_setup"]
+[ext_resource type="Resource" path="res://Data/Reactions/DebugInterceptionShot.tres" id="6_interception"]
+[ext_resource type="Resource" path="res://Data/Reactions/DebugInterceptionBurst.tres" id="7_burst"]
+[ext_resource type="Resource" path="res://Data/Reactions/DebugGuardStrike.tres" id="8_guard"]
+[ext_resource type="Resource" path="res://Data/Reactions/DebugAttackCounter.tres" id="9_counter"]
+
+[sub_resource type="StyleBoxFlat" id="Panel_v4"]
+bg_color = Color(0.025, 0.035, 0.065, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95, 0.24, 0.38, 0.92)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CombatPrototype04" type="Node3D"]
+
+[node name="InventoryV1" parent="." instance=ExtResource("1_inventory_v1")]
+editable_children = true
+
+[node name="CombatV3DebugPanel" parent="InventoryV1/CombatV3/DebugUI" index="0"]
+visible = false
+process_mode = 4
+
+[node name="CombatDebugPanel" parent="InventoryV1/CombatV3/CombatV2/DebugUI" index="0"]
+visible = false
+process_mode = 4
+
+[node name="InventoryEquipmentDebugPanel" parent="InventoryV1/InventoryDebugUI" index="0"]
+visible = false
+process_mode = 4
+
+[node name="Player" parent="InventoryV1/CombatV3/CombatV2/CombatV1/VisualSlice01" index="49"]
+position = Vector3(0, 1.2, 10)
+
+[node name="TacticalUnit" parent="InventoryV1/CombatV3/CombatV2/CombatV1" index="4"]
+Initiative = 40
+MaxHealth = 100
+MaxMovementPoints = 10
+
+[node name="CombatModeController" parent="InventoryV1/CombatV3/CombatV2/CombatV1" index="5"]
+TargetSelectionHandlerPath = NodePath("../../../../../CombatV4ActionController")
+MovementActionHandlerPath = NodePath("../../../../../CombatV4ActionController")
+
+[node name="UnitBActor" parent="InventoryV1/CombatV3/CombatV2" index="2"]
+position = Vector3(4, 0.9, 5)
+
+[node name="UnitCActor" parent="InventoryV1/CombatV3/CombatV2" index="3"]
+position = Vector3(2, 0.9, 8)
+
+[node name="ReinforcementActor" parent="InventoryV1/CombatV3/CombatV2" index="4"]
+visible = true
+position = Vector3(-4, 0.9, 7)
+
+[node name="UnitB" parent="InventoryV1/CombatV3/CombatV2" index="5"]
+TeamId = 2
+Initiative = 30
+MaxHealth = 100
+
+[node name="UnitC" parent="InventoryV1/CombatV3/CombatV2" index="6"]
+TeamId = 2
+Initiative = 20
+MaxHealth = 100
+
+[node name="ReinforcementUnit" parent="InventoryV1/CombatV3/CombatV2" index="7"]
+TeamId = 2
+StartAsParticipant = true
+Initiative = 15
+MaxHealth = 100
+
+[node name="PrototypeSetupV4" type="Node" parent="."]
+script = ExtResource("5_setup")
+InventorySetupPath = NodePath("../InventoryV1/PrototypeSetup")
+
+[node name="ReactionSystems" type="Node" parent="."]
+
+[node name="UnitBReactions" type="Node" parent="ReactionSystems"]
+script = ExtResource("4_reaction_loadout")
+OwnerUnitPath = NodePath("../../InventoryV1/CombatV3/CombatV2/UnitB")
+Definitions = Array[ExtResource("6_interception")]([ExtResource("6_interception"), ExtResource("7_burst")])
+
+[node name="UnitCReactions" type="Node" parent="ReactionSystems"]
+script = ExtResource("4_reaction_loadout")
+OwnerUnitPath = NodePath("../../InventoryV1/CombatV3/CombatV2/UnitC")
+Definitions = Array[ExtResource("8_guard")]([ExtResource("8_guard"), ExtResource("9_counter")])
+
+[node name="UnitDReactions" type="Node" parent="ReactionSystems"]
+script = ExtResource("4_reaction_loadout")
+OwnerUnitPath = NodePath("../../InventoryV1/CombatV3/CombatV2/ReinforcementUnit")
+Definitions = Array[ExtResource("9_counter")]([ExtResource("9_counter")])
+
+[node name="CombatV4ActionController" type="Node" parent="."]
+script = ExtResource("2_v4_controller")
+TurnManagerPath = NodePath("../InventoryV1/CombatV3/CombatV2/TurnManager")
+CombatControllerPath = NodePath("../InventoryV1/CombatV3/CombatV2/CombatV1/CombatModeController")
+CameraPath = NodePath("../InventoryV1/CombatV3/CombatV2/CombatV1/VisualSlice01/CameraRig/PitchPivot/SpringArm3D/Camera3D")
+TargetMarkerPath = NodePath("../InventoryV1/CombatV3/TargetMarker")
+ReactionOrderSeed = 8404
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+
+[node name="CombatV4DebugPanel" type="PanelContainer" parent="DebugUI"]
+visible = false
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 472.0
+offset_bottom = -12.0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_v4")
+script = ExtResource("3_v4_panel")
+TurnManagerPath = NodePath("../../InventoryV1/CombatV3/CombatV2/TurnManager")
+CombatControllerPath = NodePath("../../InventoryV1/CombatV3/CombatV2/CombatV1/CombatModeController")
+ActionControllerPath = NodePath("../../CombatV4ActionController")
+
+[node name="Margin" type="MarginContainer" parent="DebugUI/CombatV4DebugPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin"]
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+text = "COMBAT V4 — REACTIONS DEBUG"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="Status" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(420, 190)
+theme_override_font_sizes/font_size = 13
+text = "ROUND : 0"
+
+[node name="AttackBox" type="VBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+
+[node name="AttackRow" type="HBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/AttackBox"]
+
+[node name="Attack" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/AttackBox/AttackRow"]
+size_flags_horizontal = 3
+text = "ATTAQUER"
+
+[node name="Declare" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/AttackBox/AttackRow"]
+size_flags_horizontal = 3
+text = "DECLARER"
+
+[node name="TargetSelector" type="OptionButton" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/AttackBox"]
+item_count = 0
+
+[node name="TargetStatus" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+text = "CIBLE : -"
+
+[node name="ReactionBox" type="VBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+visible = false
+
+[node name="ReactionStatus" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/ReactionBox"]
+text = "REACTION"
+
+[node name="ChoiceRow" type="HBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/ReactionBox"]
+
+[node name="ChoiceOne" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/ReactionBox/ChoiceRow"]
+size_flags_horizontal = 3
+text = "CHOIX 1"
+
+[node name="ChoiceTwo" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/ReactionBox/ChoiceRow"]
+size_flags_horizontal = 3
+text = "CHOIX 2"
+
+[node name="Refuse" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/ReactionBox"]
+text = "REFUSER POUR CETTE ACTION"
+
+[node name="MovementStatus" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+autowrap_mode = 2
+text = "ACTION MOUVEMENT : -"
+
+[node name="MovementRow" type="HBoxContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+visible = false
+
+[node name="Continue" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/MovementRow"]
+size_flags_horizontal = 3
+text = "CONTINUER"
+
+[node name="Modify" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/MovementRow"]
+size_flags_horizontal = 3
+text = "MODIFIER"
+
+[node name="Stop" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/MovementRow"]
+size_flags_horizontal = 3
+text = "ARRETER"
+
+[node name="EndTurn" type="Button" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+text = "FIN DU TOUR"
+
+[node name="Separator" type="HSeparator" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+
+[node name="SecondaryScroll" type="ScrollContainer" parent="DebugUI/CombatV4DebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Help" type="Label" parent="DebugUI/CombatV4DebugPanel/Margin/VBox/SecondaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 2
+text = "TEST V4 : déplacez A vers le nord pour entrer dans les réactions de B/C. Après une réaction acceptée, utilisez CONTINUER, MODIFIER ou ARRÊTER. Déclarez une attaque pour tester le counter avant lancement. Les réactions sont gratuites et ne créent aucune chaîne."
+
+[editable path="InventoryV1"]

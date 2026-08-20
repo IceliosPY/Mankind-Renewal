@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ReactionDefinition" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Reactions/ReactionDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+ReactionId = "reaction.debug_interception_shot"
+DisplayName = "TIR D'INTERCEPTION"
+DebugDescription = "Tir gratuit a la premiere cellule atteinte dans la portee de l'arme active."
+Trigger = 0
+WeaponRequirement = 1
+Resolution = 0

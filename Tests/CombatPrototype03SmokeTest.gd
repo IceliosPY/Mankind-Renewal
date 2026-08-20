@@ -215,7 +215,7 @@ func _run() -> void:
 	controller.call("ExitCombat")
 	await _wait_physics_frames(3)
 	_check(not panel.visible and not bool(controller.call("GetIsCombatActive")), "La sortie Combat retourne proprement en exploration")
-	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/CombatPrototype03.tscn", "La scene principale validee reste CombatPrototype03")
+	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/InventoryEquipmentPrototype01.tscn", "La scene principale validee reste InventoryEquipmentPrototype01")
 
 	prototype.queue_free()
 	await process_frame

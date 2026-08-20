@@ -7,7 +7,7 @@ using MankindRenewal.Items;
 
 namespace MankindRenewal.Equipment;
 
-public partial class EquipmentLoadout : Node, IActiveWeaponProvider
+public partial class EquipmentLoadout : Node, IActiveWeaponInstanceProvider
 {
     [Export] public NodePath InventoryPath { get; set; } = new();
     [Export] public NodePath TacticalUnitPath { get; set; } = new();
@@ -49,6 +49,8 @@ public partial class EquipmentLoadout : Node, IActiveWeaponProvider
 
     public bool Equip(ItemInstance? instance, string slotId)
     {
+        if (OperationsLocked())
+            return false;
         if (instance is null || !Inventory.Contains(instance) || !_equipped.ContainsKey(slotId))
             return false;
         EquipmentSlotDefinition? slot = GetSlotDefinition(slotId);
@@ -70,6 +72,8 @@ public partial class EquipmentLoadout : Node, IActiveWeaponProvider
 
     public bool Unequip(string slotId)
     {
+        if (OperationsLocked())
+            return false;
         if (!_equipped.TryGetValue(slotId, out ItemInstance? instance) || instance is null)
             return false;
         WeaponDefinition? previousActiveWeapon = GetActiveWeapon();
@@ -82,6 +86,8 @@ public partial class EquipmentLoadout : Node, IActiveWeaponProvider
 
     public bool SetActiveSlot(string slotId)
     {
+        if (OperationsLocked())
+            return false;
         if (!_equipped.TryGetValue(slotId, out ItemInstance? item)
             || item?.Definition is not WeaponDefinition
             || GetSlotDefinition(slotId)?.SlotType != EquipmentSlotType.Weapon)
@@ -153,7 +159,17 @@ public partial class EquipmentLoadout : Node, IActiveWeaponProvider
         };
     }
 
-    private bool CanRemoveFromInventory(ItemInstance instance) => !IsEquipped(instance);
+    private bool CanRemoveFromInventory(ItemInstance instance) => !OperationsLocked() && !IsEquipped(instance);
+
+    private bool OperationsLocked()
+    {
+        foreach (Node node in GetTree().GetNodesInGroup("equipment_operation_locks"))
+        {
+            if (node is IEquipmentOperationLock operationLock && operationLock.IsEquipmentOperationLocked(OwnerUnit))
+                return true;
+        }
+        return false;
+    }
 
     private string FindFirstOccupiedWeaponSlot()
     {

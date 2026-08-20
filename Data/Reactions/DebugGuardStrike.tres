@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ReactionDefinition" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Reactions/ReactionDefinition.cs" id="1"]
+
+[resource]
+script = ExtResource("1")
+ReactionId = "reaction.debug_guard_strike"
+DisplayName = "INTERCEPTION DE MELEE"
+DebugDescription = "Frappe un ennemi apres son arrivee sur une cellule adjacente."
+Trigger = 0
+WeaponRequirement = 2
+MaximumRangeInCells = 1
+Resolution = 0

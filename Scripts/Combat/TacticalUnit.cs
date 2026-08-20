@@ -234,6 +234,15 @@ public partial class TacticalUnit : Node
             : null;
     }
 
+    public MankindRenewal.Items.ItemInstance? GetActiveWeaponInstance()
+    {
+        if (ActiveWeaponProviderPath.IsEmpty)
+            return null;
+        return GetNodeOrNull(ActiveWeaponProviderPath) is IActiveWeaponInstanceProvider provider
+            ? provider.GetActiveWeaponInstance()
+            : null;
+    }
+
     public int GetEffectiveDodge() => Mathf.Max(BaseDodge, 0);
 
     public int GetEffectiveParry() => Mathf.Max(BaseParry, 0);

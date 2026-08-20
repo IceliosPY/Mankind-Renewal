@@ -14,6 +14,7 @@ public partial class CombatModeController : Node
     [Export] public NodePath GameModeManagerPath { get; set; } = new();
     [Export] public NodePath CameraPath { get; set; } = new();
     [Export] public NodePath TargetSelectionHandlerPath { get; set; } = new();
+    [Export] public NodePath MovementActionHandlerPath { get; set; } = new();
     [Export(PropertyHint.Range, "0.5,5.0,0.1")] public float MaximumEntrySnapDistance { get; set; } = 2.2f;
     [Export] public float PlayerCenterHeight { get; set; } = 0.9f;
     [Export] public float MouseRayLength { get; set; } = 1000.0f;
@@ -29,6 +30,7 @@ public partial class CombatModeController : Node
     private Camera3D _camera = null!;
     private TurnManager? _turnManager;
     private ICombatTargetSelectionHandler? _targetSelectionHandler;
+    private ICombatMovementActionHandler? _movementActionHandler;
     private readonly List<TacticalUnit> _engagedUnits = new();
     private readonly HashSet<TacticalUnit> _subscribedUnits = new();
 
@@ -42,6 +44,8 @@ public partial class CombatModeController : Node
         _turnManager = GetTree().GetFirstNodeInGroup("turn_manager") as TurnManager;
         if (!TargetSelectionHandlerPath.IsEmpty)
             _targetSelectionHandler = GetNodeOrNull(TargetSelectionHandlerPath) as ICombatTargetSelectionHandler;
+        if (!MovementActionHandlerPath.IsEmpty)
+            _movementActionHandler = GetNodeOrNull(MovementActionHandlerPath) as ICombatMovementActionHandler;
         SubscribeUnit(_primaryUnit);
         if (_turnManager is not null)
         {
@@ -172,6 +176,8 @@ public partial class CombatModeController : Node
     {
         if (!IsCombatActive || _turnManager is null)
             return false;
+        if (_movementActionHandler?.CanEndTurn(_turnManager.ActiveUnit) == false)
+            return false;
         _grid.ClearPath();
         return _turnManager.EndCurrentTurn();
     }
@@ -274,6 +280,8 @@ public partial class CombatModeController : Node
         TacticalUnit? unit = GetCommandedUnit();
         if (!IsCombatActive || unit?.CurrentCell is null || unit.IsMoving)
             return false;
+        if (_movementActionHandler?.CanStartMovement(unit, destination) == false)
+            return false;
         if (unit.UseTurnEconomy && (!unit.IsActiveTurn || !_grid.GetCellIsReachable(destination.CellId)))
             return false;
         if (destination.IsOccupied && destination != unit.CurrentCell)
@@ -291,7 +299,10 @@ public partial class CombatModeController : Node
         }
 
         _grid.ShowPath(path);
-        return unit.FollowPath(path);
+        if (!unit.FollowPath(path))
+            return false;
+        _movementActionHandler?.OnMovementStarted(unit, destination);
+        return true;
     }
 
     private bool TryEnterUnit(TacticalUnit unit)
@@ -375,12 +386,20 @@ public partial class CombatModeController : Node
         TacticalUnit? unit = GetCommandedUnit();
         if (unit?.CurrentCell == cell)
             _grid.SetCurrentCell(cell);
+        if (unit is not null && _movementActionHandler?.OnMovementCellReached(unit, cell) == true)
+        {
+            unit.CancelPath();
+            _grid.ClearPath();
+        }
         RefreshReachableCells();
     }
 
     private void OnPathCompleted()
     {
         _grid.ClearPath();
+        TacticalUnit? unit = GetCommandedUnit();
+        if (unit is not null)
+            _movementActionHandler?.OnMovementPathCompleted(unit);
         RefreshReachableCells();
     }
 

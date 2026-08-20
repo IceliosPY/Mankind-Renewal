@@ -1,17 +1,27 @@
-using System.Threading;
 using MankindRenewal.Combat.Weapons;
+using MankindRenewal.Items;
 
 namespace MankindRenewal.Combat.Actions;
 
 public sealed class CombatAttackAction
 {
-    private static long _nextId;
-
     public CombatAttackAction(TacticalUnit attacker, TacticalUnit target, WeaponDefinition weapon, int distanceInCells)
+        : this(CombatActionId.Next(), attacker, target, null, weapon, distanceInCells)
     {
-        ActionId = Interlocked.Increment(ref _nextId);
+    }
+
+    public CombatAttackAction(
+        long actionId,
+        TacticalUnit attacker,
+        TacticalUnit target,
+        ItemInstance? weaponInstance,
+        WeaponDefinition weapon,
+        int distanceInCells)
+    {
+        ActionId = actionId;
         Attacker = attacker;
         Target = target;
+        WeaponInstance = weaponInstance;
         Weapon = weapon;
         DistanceInCells = distanceInCells;
     }
@@ -19,6 +29,7 @@ public sealed class CombatAttackAction
     public long ActionId { get; }
     public TacticalUnit Attacker { get; }
     public TacticalUnit Target { get; }
+    public ItemInstance? WeaponInstance { get; }
     public WeaponDefinition Weapon { get; }
     public int DistanceInCells { get; }
     public AttackActionPhase Phase { get; internal set; } = AttackActionPhase.Created;

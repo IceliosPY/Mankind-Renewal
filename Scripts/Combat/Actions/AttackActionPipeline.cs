@@ -57,6 +57,61 @@ public sealed class AttackActionPipeline
         return action;
     }
 
+    public CombatAttackAction? Declare(CombatActionContext context)
+    {
+        if (context.Kind != CombatActionKind.NormalAttack || context.Target is null || context.Weapon is null)
+            return null;
+        if (Validate(context.Source, context.Target, context.Weapon) != AttackValidationStatus.Valid)
+        {
+            context.WasCancelledBeforeLaunch = true;
+            return null;
+        }
+
+        CombatAttackAction action = new(
+            context.ActionId,
+            context.Source,
+            context.Target,
+            context.WeaponInstance,
+            context.Weapon,
+            GetTacticalDistance(context.Source, context.Target))
+        {
+            Phase = AttackActionPhase.Declared,
+            OfferedReaction = GetAvailableReaction(context.Target, context.Weapon),
+        };
+
+        if (action.OfferedReaction == DefensiveReactionType.None)
+            ResolveAfterReaction(action, false);
+        else
+            action.Phase = AttackActionPhase.AwaitingReaction;
+        SyncContext(context, action);
+        return action;
+    }
+
+    public bool ResolveReaction(CombatActionContext context, CombatAttackAction action, bool acceptReaction)
+    {
+        bool resolved = ResolveReaction(action, acceptReaction);
+        if (resolved)
+            SyncContext(context, action);
+        return resolved;
+    }
+
+    public bool ResolveImmediateReactionAttack(CombatActionContext context)
+    {
+        if (!context.IsReaction || context.CanTriggerReactions || context.Target is null || context.Weapon is null)
+            return false;
+        TacticalUnit source = context.Source;
+        TacticalUnit target = context.Target;
+        if (!source.IsCombatActive || source.IsNeutralized || !target.IsCombatActive || target.IsNeutralized || source.TeamId == target.TeamId)
+            return false;
+        int distance = GetTacticalDistance(source, target);
+        if (distance < 1 || distance > context.Weapon.RangeInCells)
+            return false;
+
+        context.WasLaunched = true;
+        context.AppliedDamage = ApplyWeaponDamage(target, context.Weapon);
+        return true;
+    }
+
     public bool ResolveReaction(CombatAttackAction action, bool acceptReaction)
     {
         if (action.Phase != AttackActionPhase.AwaitingReaction || action.ReactionConsumed)
@@ -110,9 +165,7 @@ public sealed class AttackActionPipeline
         else
         {
             action.Outcome = AttackOutcome.Hit;
-            action.AppliedDamage = action.Target.ApplyRawDamage(action.Weapon.GetRawDamage());
-            if (action.Target.IsNeutralized)
-                _neutralizeUnit(action.Target);
+            action.AppliedDamage = ApplyWeaponDamage(action.Target, action.Weapon);
         }
         action.Phase = AttackActionPhase.Completed;
     }
@@ -135,6 +188,22 @@ public sealed class AttackActionPipeline
             _ => 0,
         };
         // Strict comparison is intentional: the attacker wins every equality.
-        return defence > action.Attacker.GetEffectiveAccuracy();
+        return defence > Mathf.Max(action.Weapon.BaseAccuracy, 0);
+    }
+
+    private int ApplyWeaponDamage(TacticalUnit target, WeaponDefinition weapon)
+    {
+        int damage = target.ApplyRawDamage(weapon.GetRawDamage());
+        if (target.IsNeutralized)
+            _neutralizeUnit(target);
+        return damage;
+    }
+
+    private static void SyncContext(CombatActionContext context, CombatAttackAction action)
+    {
+        context.WasLaunched = action.WasLaunched;
+        context.WasCostCommitted = action.WasCostCommitted;
+        context.AppliedDamage = action.AppliedDamage;
+        context.WasCancelledBeforeLaunch = action.Outcome == AttackOutcome.CancelledBeforeLaunch;
     }
 }
