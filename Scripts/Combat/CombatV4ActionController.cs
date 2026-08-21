@@ -16,6 +16,7 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     [Export] public NodePath CombatControllerPath { get; set; } = new();
     [Export] public NodePath CameraPath { get; set; } = new();
     [Export] public NodePath TargetMarkerPath { get; set; } = new();
+    [Export] public NodePath AttackRulesPath { get; set; } = new();
     [Export(PropertyHint.Range, "10,200,1")] public float ScreenSelectionRadius { get; set; } = 55.0f;
     [Export] public ulong ReactionOrderSeed { get; set; } = 8404;
 
@@ -32,6 +33,7 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     private Camera3D _camera = null!;
     private Node3D? _targetMarker;
     private AttackActionPipeline _attackPipeline = null!;
+    private ICombatAttackRules? _attackRules;
     private readonly RandomNumberGenerator _random = new();
     private readonly Dictionary<long, HashSet<TacticalUnit>> _closedReactors = new();
     private readonly Dictionary<(TacticalUnit Unit, string ReactionId), int> _roundUses = new();
@@ -66,7 +68,8 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
         _combatController = GetNode<CombatModeController>(CombatControllerPath);
         _camera = GetNode<Camera3D>(CameraPath);
         _targetMarker = GetNodeOrNull<Node3D>(TargetMarkerPath);
-        _attackPipeline = new AttackActionPipeline(_turnManager, NeutralizeUnit);
+        _attackRules = AttackRulesPath.IsEmpty ? null : GetNodeOrNull(AttackRulesPath) as ICombatAttackRules;
+        _attackPipeline = new AttackActionPipeline(_turnManager, NeutralizeUnit, _attackRules);
         _random.Seed = ReactionOrderSeed == 0 ? 8404 : ReactionOrderSeed;
         _turnManager.RoundStarted += OnRoundStarted;
         _turnManager.TurnStarted += OnTurnStarted;
@@ -82,6 +85,21 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
         _turnManager.RoundStarted -= OnRoundStarted;
         _turnManager.TurnStarted -= OnTurnStarted;
         _turnManager.CombatEnded -= OnCombatEnded;
+        CurrentActionContext = null;
+        CurrentAttack = null;
+        PendingOpportunity = null;
+        SelectedTarget = null;
+        _interruptedContext = null;
+        _movementContext = null;
+        _closedReactors.Clear();
+        _roundUses.Clear();
+        _offerCounts.Clear();
+        _attackRules = null;
+        _attackPipeline = null!;
+        _targetMarker = null;
+        _camera = null!;
+        _combatController = null!;
+        _turnManager = null!;
     }
 
     public override void _Process(double delta)
@@ -288,6 +306,11 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     {
         if (!_awaitingMovementChoice || _movementContext is null || _movementContext.Source.IsNeutralized)
             return false;
+        if (CompleteMovementIfDestinationReached())
+        {
+            NotifyStateChanged();
+            return true;
+        }
         _resumeRequest = ResumeRequest.Continue;
         bool result = _combatController.TrySelectDestinationCellId(_movementContext.DestinationCellId);
         if (!result)
@@ -330,6 +353,8 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     public bool GetHasPendingDefensiveReaction() => CurrentAttack?.Phase == AttackActionPhase.AwaitingReaction;
     public bool GetIsAwaitingMovementChoice() => _awaitingMovementChoice;
     public bool GetIsAwaitingModifiedDestination() => _resumeRequest == ResumeRequest.Modify;
+    public bool GetIsMovementPausedForReaction() => _movementPausedForReaction;
+    public bool GetIsMovementInProgress() => _movementInProgress;
     public long GetCurrentActionId() => CurrentActionContext?.ActionId ?? _movementContext?.ActionId ?? 0;
     public long GetCurrentMovementActionId() => _movementContext?.ActionId ?? 0;
     public long GetLastCompletedMovementActionId() => _lastCompletedMovementActionId;
@@ -423,7 +448,9 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
         int maximumRange = definition.MaximumRangeInCells > 0
             ? Math.Min(definition.MaximumRangeInCells, weapon.RangeInCells)
             : weapon.RangeInCells;
-        return distance >= 1 && distance <= maximumRange;
+        if (distance < 1 || distance > maximumRange)
+            return false;
+        return _attackRules?.EvaluateAttack(reactor, _interruptedContext!.Source, weapon).IsBlocked != true;
     }
 
     private void AdvanceAfterDecision()
@@ -454,7 +481,8 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
             }
             else
             {
-                CallDeferred(nameof(ResumeMovementAutomatically));
+                if (!CompleteMovementIfDestinationReached())
+                    CallDeferred(nameof(ResumeMovementAutomatically));
             }
         }
         else if (_interruptedContext?.Kind == CombatActionKind.NormalAttack)
@@ -468,6 +496,11 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     {
         if (_movementContext is null || _movementContext.Source.IsNeutralized || _turnManager.ActiveUnit != _movementContext.Source)
             return;
+        if (CompleteMovementIfDestinationReached())
+        {
+            NotifyStateChanged();
+            return;
+        }
         _movementPausedForReaction = false;
         _awaitingMovementChoice = true;
         _resumeRequest = ResumeRequest.Continue;
@@ -478,6 +511,24 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
             _lastDecisionText = $"Action #{_movementContext.ActionId} : reprise impossible, choisissez MODIFIER ou ARRETER";
         }
         NotifyStateChanged();
+    }
+
+    private bool CompleteMovementIfDestinationReached()
+    {
+        if (_movementContext is null || _movementContext.Source.CurrentCell?.CellId != _movementContext.DestinationCellId)
+            return false;
+
+        _lastCompletedMovementActionId = _movementContext.ActionId;
+        _lastDecisionText = $"Action #{_movementContext.ActionId} terminee sur la cellule de destination";
+        _movementContext = null;
+        _interruptedContext = null;
+        CurrentActionContext = null;
+        PendingOpportunity = null;
+        _movementPausedForReaction = false;
+        _movementInProgress = false;
+        _awaitingMovementChoice = false;
+        _resumeRequest = ResumeRequest.None;
+        return true;
     }
 
     private void LaunchDeclaredAttack()

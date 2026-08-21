@@ -8,11 +8,13 @@ public sealed class AttackActionPipeline
 {
     private readonly TurnManager _turnManager;
     private readonly Action<TacticalUnit> _neutralizeUnit;
+    private readonly ICombatAttackRules? _attackRules;
 
-    public AttackActionPipeline(TurnManager turnManager, Action<TacticalUnit> neutralizeUnit)
+    public AttackActionPipeline(TurnManager turnManager, Action<TacticalUnit> neutralizeUnit, ICombatAttackRules? attackRules = null)
     {
         _turnManager = turnManager;
         _neutralizeUnit = neutralizeUnit;
+        _attackRules = attackRules;
     }
 
     public AttackValidationStatus Validate(TacticalUnit? attacker, TacticalUnit? target, WeaponDefinition? weapon)
@@ -34,6 +36,8 @@ public sealed class AttackActionPipeline
         int distance = GetTacticalDistance(attacker, target);
         if (distance < 1 || distance > weapon.RangeInCells)
             return AttackValidationStatus.OutOfRange;
+        if (_attackRules?.EvaluateAttack(attacker, target, weapon).IsBlocked == true)
+            return AttackValidationStatus.LineOfFireBlocked;
         if (attacker.CurrentActionPoints < weapon.ActionPointCost)
             return AttackValidationStatus.InsufficientActionPoints;
         return AttackValidationStatus.Valid;
@@ -78,6 +82,10 @@ public sealed class AttackActionPipeline
             Phase = AttackActionPhase.Declared,
             OfferedReaction = GetAvailableReaction(context.Target, context.Weapon),
         };
+        action.Evaluation = Evaluate(context.Source, context.Target, context.Weapon);
+        context.AttackEvaluation = action.Evaluation;
+        if (action.Evaluation.Interceptor is not null)
+            action.OfferedReaction = DefensiveReactionType.None;
 
         if (action.OfferedReaction == DefensiveReactionType.None)
             ResolveAfterReaction(action, false);
@@ -107,8 +115,16 @@ public sealed class AttackActionPipeline
         if (distance < 1 || distance > context.Weapon.RangeInCells)
             return false;
 
+        CombatAttackEvaluation evaluation = Evaluate(source, target, context.Weapon);
+        context.AttackEvaluation = evaluation;
+        if (evaluation.IsBlocked)
+        {
+            context.WasCancelledBeforeLaunch = true;
+            return false;
+        }
+
         context.WasLaunched = true;
-        context.AppliedDamage = ApplyWeaponDamage(target, context.Weapon);
+        context.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, context.Weapon, evaluation.DamageMultiplier);
         return true;
     }
 
@@ -143,6 +159,15 @@ public sealed class AttackActionPipeline
             return;
         }
 
+        CombatAttackEvaluation evaluation = Evaluate(action.Attacker, action.Target, action.Weapon);
+        action.Evaluation = evaluation;
+        if (evaluation.IsBlocked)
+        {
+            action.Outcome = AttackOutcome.CancelledBeforeLaunch;
+            action.Phase = AttackActionPhase.Cancelled;
+            return;
+        }
+
         if (!action.Attacker.SpendActionPoints(action.Weapon.ActionPointCost))
         {
             action.Outcome = AttackOutcome.CancelledBeforeLaunch;
@@ -165,7 +190,7 @@ public sealed class AttackActionPipeline
         else
         {
             action.Outcome = AttackOutcome.Hit;
-            action.AppliedDamage = ApplyWeaponDamage(action.Target, action.Weapon);
+            action.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, action.Weapon, evaluation.DamageMultiplier);
         }
         action.Phase = AttackActionPhase.Completed;
     }
@@ -188,12 +213,13 @@ public sealed class AttackActionPipeline
             _ => 0,
         };
         // Strict comparison is intentional: the attacker wins every equality.
-        return defence > Mathf.Max(action.Weapon.BaseAccuracy, 0);
+        int accuracy = action.Evaluation?.EffectiveAccuracy ?? action.Weapon.BaseAccuracy;
+        return defence > Mathf.Max(accuracy, 0);
     }
 
-    private int ApplyWeaponDamage(TacticalUnit target, WeaponDefinition weapon)
+    private int ApplyWeaponDamage(TacticalUnit target, WeaponDefinition weapon, float multiplier = 1.0f)
     {
-        int damage = target.ApplyRawDamage(weapon.GetRawDamage());
+        int damage = target.ApplyRawDamage(weapon.GetRawDamage() * Mathf.Max(multiplier, 0.0f));
         if (target.IsNeutralized)
             _neutralizeUnit(target);
         return damage;
@@ -205,5 +231,9 @@ public sealed class AttackActionPipeline
         context.WasCostCommitted = action.WasCostCommitted;
         context.AppliedDamage = action.AppliedDamage;
         context.WasCancelledBeforeLaunch = action.Outcome == AttackOutcome.CancelledBeforeLaunch;
+        context.AttackEvaluation = action.Evaluation;
     }
+
+    private CombatAttackEvaluation Evaluate(TacticalUnit attacker, TacticalUnit target, WeaponDefinition weapon)
+        => _attackRules?.EvaluateAttack(attacker, target, weapon) ?? CombatAttackEvaluation.Open(target, weapon);
 }

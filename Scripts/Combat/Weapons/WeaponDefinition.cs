@@ -12,6 +12,7 @@ public partial class WeaponDefinition : ItemDefinition
     [Export(PropertyHint.Range, "0,1000,1")] public int BaseAccuracy { get; set; } = 20;
     [Export(PropertyHint.Range, "1,100,1")] public int RangeInCells { get; set; } = 1;
     [Export] public bool AllowsParry { get; set; }
+    [Export] public WeaponTrait Traits { get; set; }
 
     [ExportGroup("Damage")]
     [Export] public DamageType PrimaryDamageType { get; set; } = DamageType.Ballistic;
@@ -48,5 +49,7 @@ public partial class WeaponDefinition : ItemDefinition
     public int GetDamageComponentCount() => DamageComponents.Count;
     public float GetRawDamageValue() => GetRawDamage();
     public bool GetAllowsParry() => AllowsParry;
+    public bool HasTrait(WeaponTrait trait) => (Traits & trait) == trait;
+    public bool GetHasCoverPiercing() => HasTrait(WeaponTrait.CoverPiercing);
     public bool GetIsValidDefinition() => IsValidDefinition();
 }

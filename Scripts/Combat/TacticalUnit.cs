@@ -22,6 +22,8 @@ public partial class TacticalUnit : Node
     [Export(PropertyHint.Range, "0,1000,1")] public int BaseDodge { get; set; }
     [Export(PropertyHint.Range, "0,1000,1")] public int BaseParry { get; set; }
     [Export] public NodePath ActiveWeaponProviderPath { get; set; } = new();
+    [Export] public NodePath FireOriginPath { get; set; } = new();
+    [Export] public NodePath TargetPointPath { get; set; } = new();
 
     [ExportGroup("Turn economy")]
     [Export] public bool UseTurnEconomy { get; set; }
@@ -241,6 +243,18 @@ public partial class TacticalUnit : Node
         return GetNodeOrNull(ActiveWeaponProviderPath) is IActiveWeaponInstanceProvider provider
             ? provider.GetActiveWeaponInstance()
             : null;
+    }
+
+    public Vector3 GetFireOriginWorldPosition()
+    {
+        Node3D? marker = FireOriginPath.IsEmpty ? null : GetNodeOrNull<Node3D>(FireOriginPath);
+        return marker?.GlobalPosition ?? _actor.GlobalPosition;
+    }
+
+    public Vector3 GetTargetPointWorldPosition()
+    {
+        Node3D? marker = TargetPointPath.IsEmpty ? null : GetNodeOrNull<Node3D>(TargetPointPath);
+        return marker?.GlobalPosition ?? _actor.GlobalPosition;
     }
 
     public int GetEffectiveDodge() => Mathf.Max(BaseDodge, 0);

@@ -41,4 +41,5 @@ public sealed class CombatAttackAction
     public bool WasLaunched { get; internal set; }
     public int AppliedDamage { get; internal set; }
     public AttackOutcome Outcome { get; internal set; } = AttackOutcome.Pending;
+    public CombatAttackEvaluation? Evaluation { get; internal set; }
 }

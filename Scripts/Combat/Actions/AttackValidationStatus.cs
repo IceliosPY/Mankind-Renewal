@@ -11,4 +11,5 @@ public enum AttackValidationStatus
     OutOfRange,
     InsufficientActionPoints,
     AttackerBusy,
+    LineOfFireBlocked,
 }

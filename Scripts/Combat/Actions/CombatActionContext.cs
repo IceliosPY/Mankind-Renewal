@@ -21,6 +21,7 @@ public sealed class CombatActionContext
     public bool WasLaunched { get; internal set; }
     public bool WasCostCommitted { get; internal set; }
     public bool WasCancelledBeforeLaunch { get; internal set; }
+    public CombatAttackEvaluation? AttackEvaluation { get; internal set; }
 
     public static CombatActionContext NormalAttack(
         TacticalUnit source,

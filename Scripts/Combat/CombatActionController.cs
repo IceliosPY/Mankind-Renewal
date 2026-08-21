@@ -209,6 +209,7 @@ public partial class CombatActionController : Node, ICombatTargetSelectionHandle
             AttackValidationStatus.OutOfRange => "HORS DE PORTEE",
             AttackValidationStatus.InsufficientActionPoints => "PA INSUFFISANTS",
             AttackValidationStatus.AttackerBusy => "ATTAQUANT EN MOUVEMENT",
+            AttackValidationStatus.LineOfFireBlocked => "LINE OF FIRE BLOQUEE",
             _ => status.ToString().ToUpperInvariant(),
         };
     }

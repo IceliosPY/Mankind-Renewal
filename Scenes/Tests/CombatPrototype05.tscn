@@ -1,0 +1,330 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/CombatPrototype04.tscn" id="1_v4"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV5RulesService.cs" id="2_rules"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV5DebugPanel.cs" id="3_panel"]
+[ext_resource type="Script" path="res://Scripts/Combat/Cover/CoverProvider3D.cs" id="4_cover"]
+[ext_resource type="Script" path="res://Scripts/Tests/CombatPrototype05Setup.cs" id="5_setup"]
+[ext_resource type="Resource" path="res://Data/Cover/DebugCoverRules.tres" id="6_cover_rules"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugAntiCoverRifle.tres" id="7_anti"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugArmorPenRifle.tres" id="8_armor_pen"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Rail_3.gltf" id="9_rail"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/Prop_Crate4.gltf" id="10_crate"]
+[ext_resource type="PackedScene" path="res://Assets/ThirdParty/Quaternius/ModularSciFiMegaKitStandard/Models/WallAstra_Straight.gltf" id="11_wall"]
+
+[sub_resource type="StyleBoxFlat" id="Panel_v5"]
+bg_color = Color(0.025, 0.05, 0.055, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18, 0.88, 0.72, 0.92)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CombatPrototype05" type="Node3D"]
+
+[node name="CombatV4" parent="." instance=ExtResource("1_v4")]
+editable_children = true
+
+[node name="CombatV4ActionController" parent="CombatV4" index="4"]
+AttackRulesPath = NodePath("../../CombatV5RulesService")
+
+[node name="TacticalUnit" parent="CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1" index="4"]
+FireOriginPath = NodePath("../VisualSlice01/Player/FireOrigin")
+TargetPointPath = NodePath("../VisualSlice01/Player/TargetPoint")
+
+[node name="FireOrigin" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1/VisualSlice01/Player"]
+
+[node name="TargetPoint" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1/VisualSlice01/Player"]
+
+[node name="UnitB" parent="CombatV4/InventoryV1/CombatV3/CombatV2" index="5"]
+FireOriginPath = NodePath("../UnitBActor/FireOrigin")
+TargetPointPath = NodePath("../UnitBActor/TargetPoint")
+
+[node name="FireOrigin" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/UnitBActor"]
+
+[node name="TargetPoint" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/UnitBActor"]
+
+[node name="UnitC" parent="CombatV4/InventoryV1/CombatV3/CombatV2" index="6"]
+FireOriginPath = NodePath("../UnitCActor/FireOrigin")
+TargetPointPath = NodePath("../UnitCActor/TargetPoint")
+
+[node name="FireOrigin" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/UnitCActor"]
+
+[node name="TargetPoint" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/UnitCActor"]
+
+[node name="ReinforcementUnit" parent="CombatV4/InventoryV1/CombatV3/CombatV2" index="7"]
+FireOriginPath = NodePath("../ReinforcementActor/FireOrigin")
+TargetPointPath = NodePath("../ReinforcementActor/TargetPoint")
+
+[node name="FireOrigin" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/ReinforcementActor"]
+
+[node name="TargetPoint" type="Marker3D" parent="CombatV4/InventoryV1/CombatV3/CombatV2/ReinforcementActor"]
+
+[node name="CombatV5RulesService" type="Node" parent="."]
+script = ExtResource("2_rules")
+GridPath = NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1/TacticalGrid")
+Rules = ExtResource("6_cover_rules")
+ProviderPaths = Array[NodePath]([NodePath("../TestZones/TargetCoverProvider"), NodePath("../TestZones/ReactionWallProvider"), NodePath("../TestZones/ZoneLight"), NodePath("../TestZones/ZoneHeavy"), NodePath("../TestZones/ZoneTotal")])
+UnitPaths = Array[NodePath]([NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1/TacticalUnit"), NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/UnitB"), NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/UnitC"), NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/ReinforcementUnit")])
+
+[node name="TestZones" type="Node3D" parent="."]
+
+[node name="TargetCoverProvider" type="Node3D" parent="TestZones"]
+position = Vector3(4, 0, 5)
+script = ExtResource("4_cover")
+Level = 2
+ProtectedDirection = 2
+ObstructionRadius = 1.1
+
+[node name="CrateVisual" parent="TestZones/TargetCoverProvider" instance=ExtResource("10_crate")]
+position = Vector3(0, 0, 1)
+
+[node name="CoverLabelDebug" type="Label3D" parent="TestZones/TargetCoverProvider"]
+text = "[ SOUTH = HEAVY ]"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ReactionWallProvider" type="Node3D" parent="TestZones"]
+position = Vector3(2, 0, 7)
+script = ExtResource("4_cover")
+TacticalEnabled = false
+Level = 3
+ProtectedDirection = 3
+BlocksLineOfFire = true
+ObstructionRadius = 1.25
+
+[node name="WallVisual" parent="TestZones/ReactionWallProvider" instance=ExtResource("11_wall")]
+visible = false
+position = Vector3(1.2, 0, 0.5)
+scale = Vector3(1, 1, 0.75)
+
+[node name="CoverLabelDebug" type="Label3D" parent="TestZones/ReactionWallProvider"]
+visible = false
+text = "[ WEST = TOTAL / LOS TEST ]"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ZoneLight" type="Node3D" parent="TestZones"]
+position = Vector3(6, 0, -1)
+script = ExtResource("4_cover")
+Level = 1
+
+[node name="RailVisual" parent="TestZones/ZoneLight" instance=ExtResource("9_rail")]
+position = Vector3(0, 0, -1)
+
+[node name="CoverLabelDebug" type="Label3D" parent="TestZones/ZoneLight"]
+text = "[ NORTH = LIGHT ]"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ZoneHeavy" type="Node3D" parent="TestZones"]
+position = Vector3(8, 0, -1)
+script = ExtResource("4_cover")
+Level = 2
+
+[node name="CrateVisual" parent="TestZones/ZoneHeavy" instance=ExtResource("10_crate")]
+position = Vector3(0, 0, -1)
+
+[node name="CoverLabelDebug" type="Label3D" parent="TestZones/ZoneHeavy"]
+text = "[ NORTH = HEAVY ]"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ZoneTotal" type="Node3D" parent="TestZones"]
+position = Vector3(10, 0, -1)
+script = ExtResource("4_cover")
+Level = 3
+BlocksLineOfFire = true
+ObstructionRadius = 1.2
+
+[node name="WallVisual" parent="TestZones/ZoneTotal" instance=ExtResource("11_wall")]
+position = Vector3(0, 0, -1)
+
+[node name="CoverLabelDebug" type="Label3D" parent="TestZones/ZoneTotal"]
+text = "[ NORTH = TOTAL ]"
+font_size = 28
+outline_size = 8
+billboard = 1
+no_depth_test = true
+
+[node name="ZoneLabels" type="Node3D" parent="TestZones"]
+
+[node name="Open" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(-4, 0.3, -1)
+text = "ZONE 1 — OPEN"
+billboard = 1
+no_depth_test = true
+
+[node name="Partial" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(8, 0.3, 1)
+text = "ZONES 2/3 — LIGHT / HEAVY"
+billboard = 1
+no_depth_test = true
+
+[node name="Total" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(10, 0.3, 1)
+text = "ZONE 4 — TOTAL / PIERCING"
+billboard = 1
+no_depth_test = true
+
+[node name="Height" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(8, 2.3, -7)
+text = "ZONE 6 — HEIGHT +2 m"
+billboard = 1
+no_depth_test = true
+
+[node name="Trajectory" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(2, 0.3, 7)
+text = "ZONES 7/8 — INTERCEPTION / REACTION WALL"
+billboard = 1
+no_depth_test = true
+
+[node name="ReactionConcealed" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(0, 0.3, 7)
+text = "LOS TEST - 1 OCCULTEE"
+font_size = 22
+billboard = 1
+no_depth_test = true
+
+[node name="ReactionExposed" type="Label3D" parent="TestZones/ZoneLabels"]
+position = Vector3(0, 0.3, 5)
+text = "LOS TEST - 2 EXPOSEE"
+font_size = 22
+billboard = 1
+no_depth_test = true
+
+[node name="PrototypeSetupV5" type="Node" parent="."]
+script = ExtResource("5_setup")
+InventorySetupPath = NodePath("../CombatV4/InventoryV1/PrototypeSetup")
+TargetCoverPath = NodePath("../TestZones/TargetCoverProvider")
+ReactionWallPath = NodePath("../TestZones/ReactionWallProvider")
+InterceptorUnitPath = NodePath("../CombatV4/InventoryV1/CombatV3/CombatV2/UnitC")
+AntiCoverRifle = ExtResource("7_anti")
+ArmorPenRifle = ExtResource("8_armor_pen")
+
+[node name="DebugUI" type="CanvasLayer" parent="."]
+
+[node name="CombatV5DebugPanel" type="PanelContainer" parent="DebugUI"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -442.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_v5")
+script = ExtResource("3_panel")
+ActionControllerPath = NodePath("../../CombatV4/CombatV4ActionController")
+RulesServicePath = NodePath("../../CombatV5RulesService")
+SetupPath = NodePath("../../PrototypeSetupV5")
+
+[node name="Margin" type="MarginContainer" parent="DebugUI/CombatV5DebugPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="DebugUI/CombatV5DebugPanel/Margin"]
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="DebugUI/CombatV5DebugPanel/Margin/VBox"]
+text = "COMBAT V5 — COVER / LINE OF FIRE"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 17
+
+[node name="Analysis" type="Label" parent="DebugUI/CombatV5DebugPanel/Margin/VBox"]
+custom_minimum_size = Vector2(400, 350)
+theme_override_font_sizes/font_size = 12
+text = "TARGET : -"
+
+[node name="Separator" type="HSeparator" parent="DebugUI/CombatV5DebugPanel/Margin/VBox"]
+
+[node name="SecondaryScroll" type="ScrollContainer" parent="DebugUI/CombatV5DebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Secondary" type="VBoxContainer" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="CoverTitle" type="Label" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+text = "CONFIGURATION COVER CIBLE B"
+
+[node name="CoverDirectionTitle" type="Label" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+text = "COTE PROTEGE"
+
+[node name="CoverDirectionButtons" type="HBoxContainer" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+
+[node name="North" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverDirectionButtons"]
+size_flags_horizontal = 3
+text = "NORTH"
+
+[node name="East" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverDirectionButtons"]
+size_flags_horizontal = 3
+text = "EAST"
+
+[node name="South" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverDirectionButtons"]
+size_flags_horizontal = 3
+text = "SOUTH"
+
+[node name="West" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverDirectionButtons"]
+size_flags_horizontal = 3
+text = "WEST"
+
+[node name="CoverButtons" type="HBoxContainer" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+
+[node name="None" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverButtons"]
+size_flags_horizontal = 3
+text = "NONE"
+
+[node name="Light" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverButtons"]
+size_flags_horizontal = 3
+text = "LIGHT"
+
+[node name="Heavy" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverButtons"]
+size_flags_horizontal = 3
+text = "HEAVY"
+
+[node name="Total" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/CoverButtons"]
+size_flags_horizontal = 3
+text = "TOTAL"
+
+[node name="Flank" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+text = "SIMULER FLANK (COTE NON PROTEGE)"
+
+[node name="WeaponButtons" type="HBoxContainer" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+
+[node name="Normal" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/WeaponButtons"]
+size_flags_horizontal = 3
+text = "NORMAL"
+
+[node name="ArmorPen" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/WeaponButtons"]
+size_flags_horizontal = 3
+text = "ARMOR PEN"
+
+[node name="Piercing" type="Button" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary/WeaponButtons"]
+size_flags_horizontal = 3
+text = "COVER PIERCING"
+
+[node name="FriendlyFire" type="CheckButton" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+text = "C INTERCEPTE COMME ALLIEE (FRIENDLY FIRE)"
+
+[node name="ReactionWall" type="CheckButton" parent="DebugUI/CombatV5DebugPanel/Margin/VBox/SecondaryScroll/Secondary"]
+text = "MUR DE REACTION / TEST LOS"
+
+[editable path="CombatV4"]

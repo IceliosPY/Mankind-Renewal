@@ -93,7 +93,7 @@ func _run() -> void:
 	]:
 		var definition := load(path)
 		_check(definition != null and bool(definition.call("GetIsValidDefinition")) and not str(definition.call("GetReactionId")).is_empty(), "ReactionDefinition charge avec ID stable : " + path.get_file())
-	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/InventoryEquipmentPrototype01.tscn", "La scene principale reste InventoryEquipmentPrototype01")
+	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/CombatPrototype04.tscn", "La scene principale reste CombatPrototype04")
 
 	# Refusal closes a reactor for the complete movement action; a new movement gets a new ID.
 	var refusal := await _spawn_v4()

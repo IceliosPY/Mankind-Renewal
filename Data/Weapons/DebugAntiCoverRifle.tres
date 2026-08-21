@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Weapons/WeaponDefinition.cs" id="1_weapon"]
+[ext_resource type="Script" path="res://Scripts/Combat/Weapons/DamageComponent.cs" id="2_damage"]
+
+[sub_resource type="Resource" id="Damage_ballistic"]
+script = ExtResource("2_damage")
+Amount = 20.0
+
+[resource]
+script = ExtResource("1_weapon")
+BaseAccuracy = 20
+RangeInCells = 8
+Traits = 1
+DamageComponents = Array[ExtResource("2_damage")]([SubResource("Damage_ballistic")])
+Penetration = 0.0
+ItemId = "weapon.debug_anti_cover_rifle"
+DisplayName = "Debug Anti-Cover Rifle"
+Description = "Combat V5 test weapon with the CoverPiercing trait."

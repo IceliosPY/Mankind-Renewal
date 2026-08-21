@@ -299,6 +299,13 @@ public partial class CombatModeController : Node
         }
 
         _grid.ShowPath(path);
+        if (path.Count == 1 && _movementActionHandler is not null)
+        {
+            // FollowPath completes a zero-step path synchronously. Register the
+            // action first so PathCompleted closes the existing movement context.
+            _movementActionHandler.OnMovementStarted(unit, destination);
+            return unit.FollowPath(path);
+        }
         if (!unit.FollowPath(path))
             return false;
         _movementActionHandler?.OnMovementStarted(unit, destination);

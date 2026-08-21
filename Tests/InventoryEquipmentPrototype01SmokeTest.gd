@@ -183,7 +183,7 @@ func _run() -> void:
 
 	controller.call("ExitCombat")
 	await _wait_physics_frames(3)
-	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/InventoryEquipmentPrototype01.tscn", "La scene principale reste le prototype Inventory V1 valide")
+	_check(str(ProjectSettings.get_setting("application/run/main_scene")) == "res://Scenes/Tests/CombatPrototype04.tscn", "La scene principale validee reste CombatPrototype04")
 
 	prototype.queue_free()
 	await process_frame
