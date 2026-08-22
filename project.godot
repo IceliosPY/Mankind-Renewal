@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Mankind Renewal"
-run/main_scene="res://Scenes/Tests/CombatPrototype05.tscn"
+run/main_scene="res://Scenes/Tests/CombatPrototype06.tscn"
 config/features=PackedStringArray("4.7", "C#")
 
 [display]

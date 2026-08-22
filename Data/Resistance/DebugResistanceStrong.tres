@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="DamageResistanceProfile" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Damage/DamageResistanceProfile.cs" id="1_profile"]
+[ext_resource type="Script" path="res://Scripts/Combat/Damage/DamageResistanceEntry.cs" id="2_entry"]
+
+[sub_resource type="Resource" id="Ballistic_100"]
+script = ExtResource("2_entry")
+Resistance = 100.0
+
+[sub_resource type="Resource" id="Energy_50"]
+script = ExtResource("2_entry")
+Type = 1
+Resistance = 50.0
+
+[resource]
+script = ExtResource("1_profile")
+Entries = Array[ExtResource("2_entry")]([SubResource("Ballistic_100"), SubResource("Energy_50")])

@@ -1,4 +1,5 @@
 using MankindRenewal.Combat.Weapons;
+using MankindRenewal.Combat.Damage;
 using MankindRenewal.Items;
 
 namespace MankindRenewal.Combat.Actions;
@@ -22,6 +23,7 @@ public sealed class CombatActionContext
     public bool WasCostCommitted { get; internal set; }
     public bool WasCancelledBeforeLaunch { get; internal set; }
     public CombatAttackEvaluation? AttackEvaluation { get; internal set; }
+    public DamageResolutionResult? DamageResolution { get; internal set; }
 
     public static CombatActionContext NormalAttack(
         TacticalUnit source,

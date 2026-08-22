@@ -1,4 +1,5 @@
 using MankindRenewal.Combat.Weapons;
+using MankindRenewal.Combat.Damage;
 using MankindRenewal.Items;
 
 namespace MankindRenewal.Combat.Actions;
@@ -42,4 +43,5 @@ public sealed class CombatAttackAction
     public int AppliedDamage { get; internal set; }
     public AttackOutcome Outcome { get; internal set; } = AttackOutcome.Pending;
     public CombatAttackEvaluation? Evaluation { get; internal set; }
+    public DamageResolutionResult? DamageResolution { get; internal set; }
 }

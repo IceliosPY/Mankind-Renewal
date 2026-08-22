@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using MankindRenewal.Combat.Damage;
 using MankindRenewal.Combat.Weapons;
 
 namespace MankindRenewal.Combat.Actions;
@@ -9,12 +10,18 @@ public sealed class AttackActionPipeline
     private readonly TurnManager _turnManager;
     private readonly Action<TacticalUnit> _neutralizeUnit;
     private readonly ICombatAttackRules? _attackRules;
+    private readonly IDamageResolver? _damageResolver;
 
-    public AttackActionPipeline(TurnManager turnManager, Action<TacticalUnit> neutralizeUnit, ICombatAttackRules? attackRules = null)
+    public AttackActionPipeline(
+        TurnManager turnManager,
+        Action<TacticalUnit> neutralizeUnit,
+        ICombatAttackRules? attackRules = null,
+        IDamageResolver? damageResolver = null)
     {
         _turnManager = turnManager;
         _neutralizeUnit = neutralizeUnit;
         _attackRules = attackRules;
+        _damageResolver = damageResolver;
     }
 
     public AttackValidationStatus Validate(TacticalUnit? attacker, TacticalUnit? target, WeaponDefinition? weapon)
@@ -124,7 +131,8 @@ public sealed class AttackActionPipeline
         }
 
         context.WasLaunched = true;
-        context.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, context.Weapon, evaluation.DamageMultiplier);
+        context.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, context.Weapon, evaluation.DamageMultiplier, out DamageResolutionResult? resolution);
+        context.DamageResolution = resolution;
         return true;
     }
 
@@ -190,7 +198,8 @@ public sealed class AttackActionPipeline
         else
         {
             action.Outcome = AttackOutcome.Hit;
-            action.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, action.Weapon, evaluation.DamageMultiplier);
+            action.AppliedDamage = ApplyWeaponDamage(evaluation.ResolvedTarget, action.Weapon, evaluation.DamageMultiplier, out DamageResolutionResult? resolution);
+            action.DamageResolution = resolution;
         }
         action.Phase = AttackActionPhase.Completed;
     }
@@ -217,9 +226,23 @@ public sealed class AttackActionPipeline
         return defence > Mathf.Max(accuracy, 0);
     }
 
-    private int ApplyWeaponDamage(TacticalUnit target, WeaponDefinition weapon, float multiplier = 1.0f)
+    private int ApplyWeaponDamage(
+        TacticalUnit target,
+        WeaponDefinition weapon,
+        float multiplier,
+        out DamageResolutionResult? resolution)
     {
-        int damage = target.ApplyRawDamage(weapon.GetRawDamage() * Mathf.Max(multiplier, 0.0f));
+        int damage;
+        if (_damageResolver is not null)
+        {
+            resolution = _damageResolver.ResolveAndApply(target, weapon, multiplier);
+            damage = resolution.FinalDamage;
+        }
+        else
+        {
+            resolution = null;
+            damage = target.ApplyRawDamage(weapon.GetRawDamage() * Mathf.Max(multiplier, 0.0f));
+        }
         if (target.IsNeutralized)
             _neutralizeUnit(target);
         return damage;
@@ -232,6 +255,7 @@ public sealed class AttackActionPipeline
         context.AppliedDamage = action.AppliedDamage;
         context.WasCancelledBeforeLaunch = action.Outcome == AttackOutcome.CancelledBeforeLaunch;
         context.AttackEvaluation = action.Evaluation;
+        context.DamageResolution = action.DamageResolution;
     }
 
     private CombatAttackEvaluation Evaluate(TacticalUnit attacker, TacticalUnit target, WeaponDefinition weapon)

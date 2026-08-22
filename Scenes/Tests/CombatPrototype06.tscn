@@ -1,0 +1,204 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="PackedScene" path="res://Scenes/Tests/CombatPrototype05.tscn" id="1_v5"]
+[ext_resource type="Script" path="res://Scripts/Combat/Damage/DamageResolutionService.cs" id="2_damage"]
+[ext_resource type="Script" path="res://Scripts/Tests/CombatPrototype06Setup.cs" id="3_setup"]
+[ext_resource type="Script" path="res://Scripts/Combat/CombatV6DebugPanel.cs" id="4_panel"]
+[ext_resource type="Resource" path="res://Data/Damage/DebugDamageRules.tres" id="5_rules"]
+[ext_resource type="Resource" path="res://Data/Weapons/DebugHybridRifle.tres" id="6_hybrid"]
+[ext_resource type="Resource" path="res://Data/Resistance/DebugResistanceNone.tres" id="7_none"]
+[ext_resource type="Resource" path="res://Data/Resistance/DebugResistanceLight.tres" id="8_light"]
+[ext_resource type="Resource" path="res://Data/Resistance/DebugResistanceStrong.tres" id="9_strong"]
+[ext_resource type="Script" path="res://Scripts/Combat/Damage/UnitDamageResistance.cs" id="10_unit_resistance"]
+[ext_resource type="Resource" path="res://Data/Resistance/Tests/Ballistic1000000.tres" id="11_extreme"]
+
+[sub_resource type="StyleBoxFlat" id="Panel_v6"]
+bg_color = Color(0.045, 0.035, 0.075, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.72, 0.38, 0.96, 0.92)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CombatPrototype06" type="Node3D"]
+
+[node name="CombatV5" parent="." instance=ExtResource("1_v5")]
+editable_children = true
+
+[node name="CombatV4ActionController" parent="CombatV5/CombatV4" index="4"]
+DamageResolverPath = NodePath("../../../DamageResolutionService")
+
+[node name="CombatV5DebugPanel" parent="CombatV5/DebugUI" index="0"]
+visible = false
+
+[node name="DamageResolutionService" type="Node" parent="."]
+script = ExtResource("2_damage")
+Rules = ExtResource("5_rules")
+
+[node name="ResistanceProfiles" type="Node" parent="."]
+
+[node name="UnitA" type="Node" parent="ResistanceProfiles"]
+script = ExtResource("10_unit_resistance")
+UnitPath = NodePath("../../CombatV5/CombatV4/InventoryV1/CombatV3/CombatV2/CombatV1/TacticalUnit")
+ServicePath = NodePath("../../DamageResolutionService")
+Profile = ExtResource("7_none")
+
+[node name="UnitB" type="Node" parent="ResistanceProfiles"]
+script = ExtResource("10_unit_resistance")
+UnitPath = NodePath("../../CombatV5/CombatV4/InventoryV1/CombatV3/CombatV2/UnitB")
+ServicePath = NodePath("../../DamageResolutionService")
+Profile = ExtResource("7_none")
+
+[node name="UnitC" type="Node" parent="ResistanceProfiles"]
+script = ExtResource("10_unit_resistance")
+UnitPath = NodePath("../../CombatV5/CombatV4/InventoryV1/CombatV3/CombatV2/UnitC")
+ServicePath = NodePath("../../DamageResolutionService")
+Profile = ExtResource("7_none")
+
+[node name="UnitD" type="Node" parent="ResistanceProfiles"]
+script = ExtResource("10_unit_resistance")
+UnitPath = NodePath("../../CombatV5/CombatV4/InventoryV1/CombatV3/CombatV2/ReinforcementUnit")
+ServicePath = NodePath("../../DamageResolutionService")
+Profile = ExtResource("7_none")
+
+[node name="PrototypeSetupV6" type="Node" parent="."]
+script = ExtResource("3_setup")
+InventorySetupPath = NodePath("../CombatV5/CombatV4/InventoryV1/PrototypeSetup")
+V5SetupPath = NodePath("../CombatV5/PrototypeSetupV5")
+TargetResistancePath = NodePath("../ResistanceProfiles/UnitB")
+InterceptorResistancePath = NodePath("../ResistanceProfiles/UnitC")
+HybridRifle = ExtResource("6_hybrid")
+NoneProfile = ExtResource("7_none")
+LightProfile = ExtResource("8_light")
+StrongProfile = ExtResource("9_strong")
+ExtremeProfile = ExtResource("11_extreme")
+
+[node name="DebugUIV6" type="CanvasLayer" parent="."]
+
+[node name="CombatV6DebugPanel" type="PanelContainer" parent="DebugUIV6"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -442.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel_v6")
+script = ExtResource("4_panel")
+ActionControllerPath = NodePath("../../CombatV5/CombatV4/CombatV4ActionController")
+DamageServicePath = NodePath("../../DamageResolutionService")
+SetupPath = NodePath("../../PrototypeSetupV6")
+
+[node name="Margin" type="MarginContainer" parent="DebugUIV6/CombatV6DebugPanel"]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin"]
+theme_override_constants/separation = 5
+
+[node name="Title" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox"]
+text = "COMBAT V6 — DAMAGE RESOLUTION"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 17
+
+[node name="Scroll" type="ScrollContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox"]
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="ResistanceTitle" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+text = "TARGET B — RESISTANCE PRESET"
+
+[node name="ResistanceButtons" type="HBoxContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+
+[node name="None" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/ResistanceButtons"]
+size_flags_horizontal = 3
+text = "NONE"
+
+[node name="Light" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/ResistanceButtons"]
+size_flags_horizontal = 3
+text = "LIGHT"
+
+[node name="Strong" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/ResistanceButtons"]
+size_flags_horizontal = 3
+text = "STRONG"
+
+[node name="Extreme" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/ResistanceButtons"]
+size_flags_horizontal = 3
+text = "EXTREME"
+
+[node name="InterceptorResistanceTitle" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+text = "INTERCEPTEUR C — RESISTANCE PRESET"
+
+[node name="InterceptorResistanceButtons" type="HBoxContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+
+[node name="None" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/InterceptorResistanceButtons"]
+size_flags_horizontal = 3
+text = "NONE"
+
+[node name="Light" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/InterceptorResistanceButtons"]
+size_flags_horizontal = 3
+text = "LIGHT"
+
+[node name="Strong" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/InterceptorResistanceButtons"]
+size_flags_horizontal = 3
+text = "STRONG"
+
+[node name="WeaponTitle" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+text = "ARME ACTIVE A"
+
+[node name="WeaponButtons" type="GridContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+columns = 2
+
+[node name="Normal" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/WeaponButtons"]
+size_flags_horizontal = 3
+text = "NORMAL"
+
+[node name="Hybrid" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/WeaponButtons"]
+size_flags_horizontal = 3
+text = "HYBRID"
+
+[node name="ArmorPen" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/WeaponButtons"]
+size_flags_horizontal = 3
+text = "ARMOR PEN"
+
+[node name="Piercing" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/WeaponButtons"]
+size_flags_horizontal = 3
+text = "COVER PIERCING"
+
+[node name="CoverTitle" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+text = "COVER CIBLE B"
+
+[node name="CoverButtons" type="HBoxContainer" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+
+[node name="Open" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/CoverButtons"]
+size_flags_horizontal = 3
+text = "OPEN"
+
+[node name="Total" type="Button" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content/CoverButtons"]
+size_flags_horizontal = 3
+text = "TOTAL"
+
+[node name="FriendlyFire" type="CheckButton" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+text = "C INTERCEPTE COMME ALLIEE"
+
+[node name="Separator" type="HSeparator" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+
+[node name="Analysis" type="Label" parent="DebugUIV6/CombatV6DebugPanel/Margin/VBox/Scroll/Content"]
+custom_minimum_size = Vector2(400, 640)
+theme_override_font_sizes/font_size = 12
+text = "TARGET RESISTANCES"
+
+[editable path="CombatV5"]

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="WeaponDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Combat/Weapons/WeaponDefinition.cs" id="1_weapon"]
+[ext_resource type="Script" path="res://Scripts/Combat/Weapons/DamageComponent.cs" id="2_damage"]
+
+[sub_resource type="Resource" id="Damage_ballistic"]
+script = ExtResource("2_damage")
+Amount = 20.0
+
+[sub_resource type="Resource" id="Damage_energy"]
+script = ExtResource("2_damage")
+Type = 1
+Amount = 5.0
+
+[resource]
+script = ExtResource("1_weapon")
+BaseAccuracy = 20
+RangeInCells = 8
+PrimaryDamageType = 0
+DamageComponents = Array[ExtResource("2_damage")]([SubResource("Damage_ballistic"), SubResource("Damage_energy")])
+Penetration = 10.0
+ItemId = "weapon.debug_hybrid_rifle"
+DisplayName = "Debug Hybrid Rifle"
+Description = "Combat V6 multi-type test weapon: 20 Ballistic + 5 Energy, Ballistic Penetration 10."

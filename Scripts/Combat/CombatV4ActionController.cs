@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using MankindRenewal.Combat.Actions;
+using MankindRenewal.Combat.Damage;
 using MankindRenewal.Combat.Reactions;
 using MankindRenewal.Combat.Weapons;
 using MankindRenewal.Equipment;
@@ -17,6 +18,7 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     [Export] public NodePath CameraPath { get; set; } = new();
     [Export] public NodePath TargetMarkerPath { get; set; } = new();
     [Export] public NodePath AttackRulesPath { get; set; } = new();
+    [Export] public NodePath DamageResolverPath { get; set; } = new();
     [Export(PropertyHint.Range, "10,200,1")] public float ScreenSelectionRadius { get; set; } = 55.0f;
     [Export] public ulong ReactionOrderSeed { get; set; } = 8404;
 
@@ -34,6 +36,7 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
     private Node3D? _targetMarker;
     private AttackActionPipeline _attackPipeline = null!;
     private ICombatAttackRules? _attackRules;
+    private IDamageResolver? _damageResolver;
     private readonly RandomNumberGenerator _random = new();
     private readonly Dictionary<long, HashSet<TacticalUnit>> _closedReactors = new();
     private readonly Dictionary<(TacticalUnit Unit, string ReactionId), int> _roundUses = new();
@@ -69,7 +72,8 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
         _camera = GetNode<Camera3D>(CameraPath);
         _targetMarker = GetNodeOrNull<Node3D>(TargetMarkerPath);
         _attackRules = AttackRulesPath.IsEmpty ? null : GetNodeOrNull(AttackRulesPath) as ICombatAttackRules;
-        _attackPipeline = new AttackActionPipeline(_turnManager, NeutralizeUnit, _attackRules);
+        _damageResolver = DamageResolverPath.IsEmpty ? null : GetNodeOrNull(DamageResolverPath) as IDamageResolver;
+        _attackPipeline = new AttackActionPipeline(_turnManager, NeutralizeUnit, _attackRules, _damageResolver);
         _random.Seed = ReactionOrderSeed == 0 ? 8404 : ReactionOrderSeed;
         _turnManager.RoundStarted += OnRoundStarted;
         _turnManager.TurnStarted += OnTurnStarted;
@@ -95,6 +99,7 @@ public partial class CombatV4ActionController : Node, ICombatTargetSelectionHand
         _roundUses.Clear();
         _offerCounts.Clear();
         _attackRules = null;
+        _damageResolver = null;
         _attackPipeline = null!;
         _targetMarker = null;
         _camera = null!;
